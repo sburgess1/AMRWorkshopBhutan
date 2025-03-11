@@ -8,11 +8,13 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-## R basics
+## Day 1 
 
 #### Setting up an R project
 
 It is good practice to set up your analysis as an R project. This enables reproducible code, you can share your zipped project file with others and it can be linked with github. 
+
+Set up an R project.
 
 ![](Rproject2.png)
 
@@ -42,19 +44,23 @@ help(read.csv)
 
 ***Object***
 
+***Data frame***
 
-***data frame***
-
-***vector***
+***Vector***
 
 **Pipe Operator*** %>% chains together several operation so that the result of the previous line feeds into the subsequent line. 
 
-***package***
+***Package***
 
-**Tidyverse**
+***Tibble***
 
+**Tidyverse** A collection of easy to use R packages designed for data scientists to carry out data analyses such as tidying, manipulating and plotting data.
 
-**Installing and loading packages**
+See https://bookdown.org/amy_yarnell/T32-book/selected-glossary-of-r-terminology.html for some more defintions. 
+
+### Installing and loading packages
+
+Install the R packages AMR, tidyverse, and readxl
 
 New packages can be installed by selecting:
 
@@ -66,37 +72,40 @@ Alternatively using the R code below
 install.packages("AMR")
 install.packages("tidyverse")
 install.packages("readxl")
-install.packages("lubridate")
+install.packages("cleaner")
 ```
 
-Once the required packages are installed we can then load them. 
-Packages will need to loaded at the begininng of each R session. 
+Load the packages.
 
-```{r}
+Note: Packages will need to loaded at the beginning of each R session. 
+
+```{r, results='hide', collapse=TRUE, message=FALSE}
 library(AMR)
 library(tidyverse)
 library(readxl)
+library(cleaner)
 ```
 
 
 ## Tidying and checking data
 
-**Reading in data**
+### Reading in data
 
-You can read in a csv file using base R
+Read in a csv file using base R
 
-```{r}
+```{r, error= TRUE}
 campy <- read.csv("data/Campylobacter_117.csv", header = TRUE)
 ```
-We get this error because R does not like certain characters. What is the character?
+Why do we get this error?
 
-Here a csv file is being read in that does not contain these characters.
+
+Read in a modified csv file that does not contain these characters.
 
 ```{r}
 campy <- read.csv("data/Campylobacter_117v2.csv", header = TRUE)
 ```
 
-Alternatively using the readr package from tidyverse. 
+Read in the csv file using the readr package from tidyverse. 
 
 ```{r}
 campy <- read_csv("data/Campylobacter_117v2.csv")
@@ -104,12 +113,19 @@ campy <- read_csv("data/Campylobacter_117v2.csv")
 
 The advantages of using read_csv are: you do not need to specify that the first line of data are column names, it is faster and it provides more information on the file you are reading.
 
+Readin an excel sheet using the readxl package.
 
-Other recommendations for"tidy data" are:
+```{r read}
+ecoli <- read_excel("data/Bh_AMR_Surveillance data.xlsx", sheet = "E.coli")
+```
+
+### Check your data
+
+Some recommendations for "tidy data" include:
 
 * Keep names simple
 
-* Use an underscore _ instead of a space
+* Use an underscore _ instead of a space or preferably one word
 
 * Use abbreviated words instead of a symbol. e.g. perc instead of %
 
@@ -119,21 +135,13 @@ Other recommendations for"tidy data" are:
 
 * Each observation results in one row
 
-To read in an excel sheet you can using the readxl package.
-
-```{r read}
-ecoli <- read_excel("data/bh_AMR_Surveillance_data.xlsx", sheet = "E.coli")
-```
- 
-**Check your data**
-
 The function str() is probably the most important function in R for checking the structure of your data. This gives you information on the number of rows and columns, the names of your columns, the class of each column. 
 
 ```{r}
 str(ecoli)
 ```
 
-Other functions you can use for checking your data include:
+Use the functions head(), tail(), glimpse(), summary() and table() to check your data.
 
 ```{r}
 head(ecoli)
@@ -143,11 +151,13 @@ summary(ecoli)
 table(ecoli$'Name of meat shop', useNA = "ifany")
 ```
 
-#### Tidying your data
+How are these functions different?
+
+### Tidying your data
 
 ***Group activity***
 
-Discuss what sorts of things could be tidyed up in this dataset?
+What types of things could be tidied up in the "ecoli" dataset?
 
 Why is column 5 labelled "...5" and column 19 labelled "SIR...19?
 
@@ -157,67 +167,87 @@ colnames(ecoli)
 
 ***Subsetting***
 
-To select the columns of interest you can use the select() function from the dplyr package.
+The first step in tidying your data could be selecting the columns of interest (or you may want to do this further downstream in the analysis). The select() function from the dplyr package is used to select columns of interest or remove columns. The first argument is the dataframe and the subsequent arguments are the columns that are being selected. 
 
 ```{r}
 #Select by column number
-select(ecoli, 1:16)
+select(ecoli, 16:18)
 
 #Select by column name 
 select(ecoli, Stratification, 'Location Name', 'Sample type')
 ```
 
-The select function can also be used to remove columns
+Use the select function to remove the SIR columns (which contain no values) and assign it the object "ecoli_select".
 
 ```{r}
 #Remove columns                    
 ecoli_select <- select(ecoli, !starts_with("SIR"))
+str(ecoli_select)
 ```
 
 To only keep rows that match a certain condition the filter() function can be used.
 
 ```{r}
-filter(ecoli, `Dzongkhag (sample source)` == "Thimphu")
+filter(ecoli, `Location Name` == "Babesa")
+```
 
-filter(ecoli, `Tetracyclin (30µg)` < 15)
+Multiple functions can also be chained together using %>%. In the example below the dataframe is piped into the select() function, which is used to select the columns of interest then the result from this is piped into the filter function, which is used to select those rows where the zone diameter for tetracycine is less than 15 mm. 
 
+```{r}
+
+ecoli %>%
+  select(`Location Name`, `Sample ID`, `Tetracyclin (30µg)`) %>%
+  filter(`Tetracyclin (30µg)` < 15)
+  
 ```
 
 **Renaming columns**
 
+Rename the columns so that they are simple, informative, and do not contain any special characters. 
+
 ```{r}
 #Rename columns
-colnames(ecoli_select) <- c("meat_shop", "stratification", "location_name", "GPS_x", "GPS_y", "Date", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
+colnames(ecoli_select) <- c("meatshop", "stratification", "location", "GPSx", "GPSy", "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_other_meat", "sampleID", "FTLcode", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
 ```
 
-Alternatively to rename specific columns you can use the rename() function.
-
-```{r}
-
-```
-In the above I've changed the antibiotic names to their abbreviated form. To check the abbreviation that is used by the AMR package you can use the code: 
+In the above example the antibiotic names have been changed to their abbreviated form. Check the abbreviation that is used by the AMR package for streptomycin
 
 ```{r}
 as.ab("streptomycin")
 ```
 
-To view all the antibiotics listed in the antibiotics data set from the AMR package
+To view all the antibiotics listed in the antibiotics data set from the AMR package:
 
 ```{r, eval=FALSE}
 view(antibiotics)
 ```
 
-Is there anything else from a first glance of this data that looks incorrect? Here are some other functions that can be used to have a quick look at your data.
+Alternatively to rename specific columns use the rename() function.
 
 ```{r}
-head(ecoli_select)
-tail(ecoli_select)
-glimpse(ecoli_select)
-summary(ecoli_select)
-table(ecoli_select$meat_shop, useNA = "ifany")
+ecoli %>% rename(meatshop = `Name of meat shop`,
+                 location = `Location Name`,
+                 sample_collection = `Date of sample collection`)
 ```
 
-There are methods in R that you can use to format the dates into the same format. Here instead I've re-imported the data so that all the rows have the correct date format and then changed the date column to date format. Ofter dates will come through as class "character". In the example below they are in the POSIXIt data type which is also a date/time data type. However, by using the lubridate function ymd() it is converted to the date data type, which means the package lubridate can then then be used for date analyses. 
+***Formatting the date***
+
+Some of the dates look like they may be in an excel serial date format. There are methods in R that you can use to format the dates into the same format. 
+
+```{r, eval = FALSE, results='hide', echo=FALSE}
+ec_test <- ecoli_select %>%
+  mutate(date_collection = as.character(date_collection),  # Convert to character
+         date_collection = case_when(
+           grepl("^[0-9]+$", date_collection) ~ as.character(as.Date(as.numeric(date_collection), origin = "1899-12-30")),  # Convert Excel serial numbers
+           TRUE ~ as.character(dmy(date_collection))  # Convert DD-MM-YYYY or other formats
+         )) %>%
+  mutate(date_collection = ymd(date_collection))  # Ensure final format is YYYY-MM-DD
+
+
+
+```
+
+Re-read version 2 of the excel file, which has the correct format and then change the date column to date format. 
 
 ```{r}
 ecoli <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "E.coli")
@@ -228,9 +258,8 @@ ecoli_select <- ecoli %>%
              "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
              "sample_source", "farm_category", "slaughter", "transportation", 
              "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", 
-             "GEN", "CHL", "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT")) %>%
-  mutate(species = "Escherichia coli")
-  
+             "GEN", "CHL", "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT"))  %>%
+  mutate(species = "Escherichia coli") # add in a column called species
 
 str(ecoli_select)
 
@@ -239,37 +268,79 @@ library(lubridate)
 ecoli_select$date_collection <- ymd(ecoli_select$date_collection)
 ```
 
-Next you may want to check whether the same formatting has been used for all observations for specific variables. For example in the farm_category column both a capital "C" and a lowercase "c" has been used for the word commercial. 
+Often dates will come through as class "character". In the example above they are in the POSIXIt data type which is also a date/time data type. However, by using the lubridate function ymd() it is converted to the date data type, which means the package lubridate can then then be used for date analyses. 
+
+***Manipulating categorical values***
+
+Check whether the categorical variable values are consistent for the meat_shop categorical variable using the table function. 
 
 ```{r}
-sort(unique(ecoli_select$location_name))
-sort(unique(ecoli_select$farm_category))
+table(ecoli_select$meat_shop, useNA = "ifany")
+
+#Look for values with specific characteristics, e.g. check all fields use correct spelling of meat shop values
+table(ecoli_select$meat_shop %in% c("AM MS", "DB MS", "GM MS"))
+```
+
+Use the sort and unique functions to check the meath_shop categorical variable values.
+
+```{r}
 sort(unique(ecoli_select$meat_shop))
 ```
 
-We can then use the mutate function to "commercial" to "Commercial".
+The base R function gsub() and the str_replace functions from the stringr packages can be used to replace strings.
+
+Use gsub to remove "."
+```{r}
+
+gsub("\\.", "", ecoli_select$meat_shop)
+```
+
+Use str_replace to remove the "." and replace "Bebak MS with BK MS" and assign to the object ecoli_select.
+
+```{r}
+
+ecoli_select <- ecoli_select %>%
+  mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
+         meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"))
+
+sort(unique(ecoli_select$meat_shop))
+       
+```
+
+***Exercise***
+
+Check whether any of the other categorical values need to be changed and change where appropriate. 
+
+***Manipulating categorical values***
+
+The farm_category column uses both a capital "C" and a lowercase "c" has been used for the word commercial. 
+
+```{r}
+sort(unique(ecoli_select$farm_category))
+```
+
+Here are some other ways that categorical values can be replaced. 
 
 ```{r}
 
 #The replace function can be used for one replacement
 mutate(ecoli_select, farm_category = replace(farm_category, farm_category == "commercial", "Commercial"))
 
-#case_when() can be used for multiple replacements
-mutate(ecoli_select, farm_category = case_when(
-    farm_category == "Commercial" ~ "commercial",
-    farm_category == "Semi-commercial" ~ "semi-commercial",
-    TRUE ~ farm_category
-  ))
+#recode() can be used for multiple replacements
+ecoli_select %>%
+  mutate(farm_category = recode(farm_category, 
+                                "Commercial" = "commercial", 
+                                "Semi-commercial" = "semi-commercial"))
 
-#Alternatively you can change the case
-
+#Alternatively str_ functions can be used to change the case
 mutate(ecoli_select, farm_category = str_to_lower(farm_category))
 ecoli_select <- mutate(ecoli_select, farm_category = str_to_title(farm_category))
+unique(ecoli_select$farm_category)
 ```
 
-## Data validation
+### Missing values
 
-Next you will check whether you have any missing values. These are labelled as NA (meaning not available) in R.
+Check whether there are any missing values. These are labelled as NA (meaning not available) in R.
 
 ```{r na}
 #Display rows that aren't complete cases
@@ -291,16 +362,15 @@ any(is.na(campy$'Sample ID'))
 #Will check to see all values meet this conditon
 all(ecoli_select$TCY >= 6)
 
-#Look for values with specific characteristics, e.g. check all fields use correct spelling of meat shop values
-table(ecoli_select$meat_shop %in% c("AM MS", "DB MS", "GM MS"))
+
 ```
 
-To remove all rows with missing values you can use the complete.cases function.
+To remove all rows with missing values use the complete.cases function.
 
 ```{r}
 ```
 
-To only remove rows where there are missing values in a specific column you can use the 
+To only remove rows where there are missing values in a specific column use the drop_na function
 
 ```{r}
 
@@ -309,12 +379,16 @@ To only remove rows where there are missing values in a specific column you can 
 
 ```
 
-Alternatively you can remove missing values when applying a function. For example when calculating the mean.
+Alternatively missing values can be removed when when applying a function. For example when calculating the mean.
 
 ```{r}
+
+mean(ecoli_select$TCY, na.rm = TRUE)
 ```
 
-Next look at whether the distribution of disk diffusion values looks ok. 
+### Data distribution
+
+Check whether the distribution of disk diffusion values looks ok. 
 
 ```{r}
 #Checking what the phenotype looks like, that there were no strange values.
@@ -330,21 +404,29 @@ hist(ecoli_select$TCY)
 hist(ecoli_select$SXT)
 ```
 
-## Generating an antibiogram
+## Day 2: Using the AMR R package
 
-First the disk diffusion data is converted to "disk" data type and a new column  is generated using the mutate_if() function for the SIR data. Below is also an example of chaining together multiple operations using %>% as a 'pipe'. In the example below the disk diffusion values are converted to S, I or R based on the latest CLSI guidelines. You can change the AMR guideline using the guideline argument e.g. guideline == "CLSI 2023".
+### Generating an antibiogram
+
+First the disk diffusion data is converted to "disk" data type and a new column  is generated using the mutate_if() function for the SIR data. In the example below the disk diffusion values are converted to S, I or R based on the latest CLSI guidelines. You can change the AMR guideline using the guideline argument e.g. guideline == "CLSI 2023".
 
 ```{r}
+#Convert to "disk" data type
 ecoli2 <- ecoli_select %>%
   mutate(across(GEN:SXT, as.disk))
 str(ecoli2)
 
 #To convert disk diffusion values to SIR
 ecoli3 <- ecoli2 %>% mutate_if(is.disk, as.sir, guideline = "CLSI")
+str(ecoli3)
 
-#To keep disk diffusion columns and add new columns with SIR
+#To keep disk diffusion columns and columns with SIR values
 ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>%
   mutate(across(GEN:SXT, ~ as.sir(.x, guideline = "CLSI")))
+
+
+
+str(ecoli3)
 
   
             
@@ -382,7 +464,7 @@ ecoli2 %>% mutate_if(is.disk, as.sir, guideline = "CLSI", breakpoint_type = "ani
 
 ```
 
-Next an antibiogram will be generated:
+Next generate an antibiogram:
 
 ```{r}
 
@@ -395,7 +477,15 @@ ant <- antibiogram(ecoli3,
 ant
 ```
 
-## Exercise
+Make a basic plot of the antibiograms using the autoplot() function.
+
+
+```{r}
+
+autoplot(ant)
+```
+
+***Exercise***
 
 * Read in the Enterococci and Salmonella excel sheets and assign them to "enterococci" and "salmonella".
 * Remove the SIR columns
@@ -405,7 +495,7 @@ ant
 * Change the date format
 
 
-```{r, results='hide'}
+```{r, results='hide', echo = FALSE}
 enterococci <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Enterococci")
 #Remove columns starting with SIR, change column names and add a new column with species                    
 enterococci_select <- enterococci%>% 
@@ -438,7 +528,7 @@ enterococci_select$date_collection <- ymd(enterococci_select$date_collection)
 salmonella_select$date_collection <- ymd(salmonella_select$date_collection)
 ```
 
-Next we will bind the ecoli, enteroccoci and salmonella data frames together.
+Bind the ecoli, enteroccoci and salmonella data frames together.
 
 ```{r}
 
@@ -446,9 +536,22 @@ df <- bind_rows(ecoli_select, salmonella_select, enterococci_select) %>%
   select(species, 1:34)
 ```
 
-**Exercise**
+***Exercise***
 
 1. Generate SIR columns for the new df.
+
+2. Generate the following antibiograms:
+
+    - For the antibiotics CHL, AMP and TCY
+
+    - For the species *E. coli*
+
+    - For the groups fridge and display table  (from the variable sample_collection) and antibiotics "CHL", "AMP", "TCY" and E. coli
+
+3. Make some basic plots for each of the antibiograms
+
+
+***Exercise 1***
 
 ```{r, results = FALSE}
 
@@ -460,8 +563,8 @@ df2 <- df %>%
 df3 <- df2 %>% mutate(across(GEN:VAN, ~ .x, .names = "{.col}_disk")) %>%
   mutate(across(GEN:VAN, ~ as.sir(.x, guideline = "CLSI")))
 ```
-2. Generate the following antibiograms:
-* For the antibiotics CHL, AMP and TCY
+
+***Exercise 2***
 
 ```{r}
 ant1 <- antibiogram(df3,
@@ -470,32 +573,47 @@ ant1 <- antibiogram(df3,
             digits = 1)  # Show one decimal place
 
 ant1
-autoplot(ant1)
+
 ```
 
-* For the species E. coli
 
 ```{r}
 
-df3 %>% 
+ant2 <- df3 %>% 
   filter(species == "Escherichia coli") %>%
   antibiogram(ab_transform = "name",
             digits = 1)  # Show one decimal place
 
-```
+ant2
 
-* For the groups fridge and display table  (from the variable sample_collection) and antibiotics "CHL", "AMP", "TCY" and E. coli
+```
 
 ```{r}
 
 #Using the antibiogram function from the AMR package
 
-ant2 <- df3 %>% 
+ant3 <- df3 %>% 
   filter(species == "Escherichia coli") %>%
   antibiogram(antibiotics = c("CHL", "AMP", "TCY"), syndromic_group = "sample_collection", ab_transform = "name",
             digits = 1,
-             ) # Show one decimal place
+             )
 
+ant3
+```
+
+***Exercise 3***
+
+Make some basic plots of the antibiograms using the autoplot().
+
+```{r}
+autoplot(ant1)
+autoplot(ant2)
+autoplot(ant3)
+```
+
+Use dplyr and ggplot to generate antibiograms and a plot 
+
+```{r}
 #Using  the AMR and dplyr packages
 
 df3 %>%
@@ -514,37 +632,9 @@ df3 %>%
 ```
 
 
+## Confidence Intervals 
 
-
-```{r}
-ggplot(ecoli3, aes(x = GEN)) +
-  geom_bar(fill = "steelblue", color = "black") +
-  labs(
-    title = "Frequency of Antimicrobial Interpretations (CTX)",
-    x = "GEN Interpretation (S, I, R)",
-    y = "Frequency"
-  ) +
-  theme_minimal()
-
-autoplot(ant)
-```
-Plotting box plots of disk diffusion distributions and SIR interpretation
-
-```{r}
-ggplot(ecoli3,
-       aes(x = sample_collection, y = GEN_disk, colour = GEN)) +
-  geom_jitter(width = 0.2, size = 2) +
-  geom_boxplot(fill = NA, colour = "grey40") +
-  #scale_y_mic() +
-  #scale_colour_sir() +
-  labs(title = "MIC Distribution and SIR Interpretation",
-       x = "Sample Groups",
-       y = "disk diffusion zone (mm)")
-
-```
-## Confidence Intervals ##
-
-The AMR package function sir_confidence_interval uses the Clopper-Pearson method (using the binom.test())
+Use the AMR package function sir_confidence_interval() to calculate confidence intervals. This function uses the Clopper-Pearson method (using the binom.test())
 
 ```{r CI}
 sir_confidence_interval(ecoli3$CHL)
@@ -569,17 +659,157 @@ df_summary <- ecoli3 %>%
   
 ```
 
-## More plots
+## Day 3 - Using the AMR R Package
+
+
+# First isolates
+
+Material for the following tutorial was taken from  https://msberends.github.io/AMR/articles/AMR.html#first-isolates. 
+
+When there are multiple isolates from the same sample the function first_isolate() can be used to correct for duplicate isolates. There are four different methods for that can be used for selecting the isolate(s) as described by [Hindler et al. (2007)] (https://academic.oup.com/cid/article/44/6/867/364325). The default method is phenotype-based. The other three options are "episode-based", "patient-based" and "isolate-based". 
+
+```{r}
+our_data <- example_isolates %>% 
+  select(patient, ward, date, mo, AMX, AMC, CXM) %>%
+  filter(complete.cases(.))
+
+str(our_data)  
+
+our_data %>%
+  mutate(first = first_isolate())
+
+our_data %>%
+  mutate(first = first_isolate(method = "phenotype-based"))
+```
+
+Look at the different arguments available for the first_isolate function using ?first_isolate and try some of them out
+
+```{r}
+
+our_data %>%
+  mutate(first = first_isolate(method = "phenotype-based", type = "points", points_threshold = 1))
+
+our_data %>%
+  mutate(first = first_isolate(method = "episode-based", episode_days = 7)) # 7 day interval from initial isolate
+
+our_data %>%
+  mutate(first_isolate(type = "keyantimicrobials", points_threshold = 1, col_keyantimicrobials = "AMX"))
+
+
+```
+
+Once you have decided which method you are going to use to determine the "first isolates", filter the dataframe. 
+
+```{r}
+
+our_data1 <- our_data %>%
+  mutate(first = first_isolate(method = "phenotype-based", type = "points", points_threshold = 1)) %>%
+  filter_first_isolate()
+
+our_data %>%
+  count(mo_name(mo), sort = TRUE)
+
+our_data1 %>%
+  count(mo_name(mo), sort = TRUE)
+
+our_data1 %>%
+  filter(all(betalactams() == "R"))
+```
+
+# MIC frequency distribution 
+
+Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/AMR.html#interpreting-mic-and-disk-diffusion-values
+
+Minimum inhibitory concentrations can also be converted into SIR using the as.sir() function. In the following example the MIC values are randomly generated and these values are then converted into SIR for *Klebsiella pneumoniae* using the EUCAST 2023 guidelines.
+
+```{r}
+set.seed(123)
+
+#MIC values randomly generated
+mic_values <- random_mic(100)
+
+
+
+#MIC values converted to SIR
+sir_values <- as.sir(mic_values, mo = "K. pneumoniae", ab = "cipro", guideline = "EUCAST 2023")
+
+#Create a tibble
+my_data <- tibble(MIC = mic_values, SIR = sir_values)
+my_data
+
+#autoplot the mic values
+autoplot(mic_values)
+autoplot(mic_values, mo = "K. pneumoniae", ab = "cipro", guideline = "EUCAST 2023")
+```
+
+The AMR R package cannot be used to generate an MIC frequency table so here dyply has been used to generate this table. 
+
+```{r}
+mic_values <- random_mic(90, mo = "Escherichia coli")
+
+antibiotic <- rep(c("Ampicillin","Gentamicin", "Tetracycline"), each = 30)
+animal <- rep(c("Cattle", "Pig", "Chicken"), times = 30)
+dat <- tibble(MIC = mic_values, Antibiotic= antibiotic, Animal = animal)
+
+# Define the MIC categories
+mic_breaks <- c(0, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, Inf)
+mic_labels <- c("0.25", "0.5", "1", "2", "4", "8", "16", "32", "64", "128")
+
+# Create the frequency table
+mic_table <- my_data %>%
+  mutate(MIC = as.numeric(MIC)) %>%
+  mutate(MIC_category = cut(MIC, breaks = mic_breaks, labels = mic_labels, right = FALSE)) %>%
+  group_by(Antibiotic, Animal) %>%
+  count(MIC_category) %>%
+  pivot_wider(names_from = MIC_category, values_from = n, values_fill = 0)
+
+#write.table(mic_table, file = "output/mic.txt", row.names = FALSE)
+
+my_data %>%
+  group_by(Antibiotic, Animal) %>%
+  reframe(
+    MIC_min = min(MIC),
+    MIC_max = max(MIC),
+    MIC50 = median(MIC),
+  )
+
+```
+
+# Determining multi-drug resistance
+
+Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/MDR.html
+
+The number of MDR isolates can be determined using the mdro() function. Use the example_isolates  
+
+```{r}
+x <- mdro(example_isolates, guideline = "EUCAST")
+table(x)
+
+example_isolates %>%
+  mdro() %>%
+  freq()
+```
+- Determining MDR and barplot resistance to n antibiotic classes
+
+```{r}
+```
+- Scatterplot correlations (Use Natalia's data)
+
+```{r}
+```
+- Principal Component analysis 
+
+```{r}
+```
+
+## Day 4 - Plotting
 
 The main structure for generating a ggplot is:
 ggplot(data = <dataframe> + geom<name>(mapping = aes(x = <x_variable>, y = <y_variable>, color = <variable_for_color>)))
 
-geom
-aes
-
 See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnwRfLe0w_2eaf49b2cfcf450db2f2bb95681f55f1_03_01grammarofgraphics.html?Expires=1741046400&Signature=CP49Mmw63hpCBlR5IBPO~We~0Djsy5Qox2zfzNyAISHCWkq6Amnqz6o8-1mcao8FBsA0hOvT4iKd7VARcOBVj5aamI6GMNxPgb2MDld2udjVFGQZu-4RNp0kKCEg693bmJOf6ryogLAXgKPEUT9-dVZ852EnOk-0iZU89PVvt7w_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) from the arranging and visualising coursera course. 
 
-*Some basic examples of plots*
+***Some basic examples of plots***
 
 ```{r ggplot}
 ggplot(data = ecoli3) +
@@ -612,6 +842,43 @@ ggplot(data = df4) +
     geom_boxplot(mapping = aes(x = CHL_disk, y = sample_collection))
 ```
 
+
+```{r}
+ggplot(ecoli3, aes(x = GEN)) +
+  geom_bar(fill = "steelblue", color = "black") +
+  labs(
+    title = "Frequency of Antimicrobial Interpretations (CTX)",
+    x = "GEN Interpretation (S, I, R)",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(ecoli3,
+       aes(x = sample_collection, y = GEN_disk, colour = GEN)) +
+  geom_jitter(width = 0.2, size = 2) +
+  geom_boxplot(fill = NA, colour = "grey40") +
+  #scale_y_mic() +
+  #scale_colour_sir() +
+  labs(title = "MIC Distribution and SIR Interpretation",
+       x = "Sample Groups",
+       y = "disk diffusion zone (mm)")
+
+# add a group
+my_data$group <- rep(c("A", "B", "C", "D"), each = 25) 
+
+ggplot(my_data,
+       aes(x = group, y = MIC, colour = SIR)) +
+  geom_jitter(width = 0.2, size = 2) +
+  geom_boxplot(fill = NA, colour = "grey40") +
+  scale_y_mic() +
+  scale_colour_sir() +
+  labs(title = "MIC Distribution and SIR Interpretation",
+       x = "Sample Groups",
+       y = "MIC (mg/L)")
+
+```
 
 ## Plots for publications
 
@@ -712,62 +979,40 @@ ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) 
 
 ```
 
-
 ```{r}
-str(clinical_breakpoints)
-filter(clinical_breakpoints, mo == "B_ESCHR_COLI")
-filter(clinical_breakpoints, mo != "B_ESCHR_COLI")
-filter(clinical_breakpoints, mo == "B_ESCHR_COLI" & method == "DISK" & guideline == "CLSI 2023")
-filter(clinical_breakpoints, mo == "B_ESCHR_COLI" | mo == "B_ENTRC")
-
-clinical_breakpoints %>%
-  mutate(bacteria = mo_fullname()) %>%
-  # filtering functions for microorganisms:
-  filter(mo_is_gram_negative(),
-         mo_is_intrinsic_resistant(ab = "cefotax"))%>%
-  select(bacteria,
-         aminoglycosides(),
-         carbapenems())
-
-```
-
-
-
-Grouping and summarising data
-```{r}
-#Taking the mean for a group, in this case the mean tetracycline diffusion zone for each location
-#summarize(group_by(ecoli, Region2), mean(CTXdiff))
-#alternatively
-ecoli_select %>% 
-  group_by(location_name) %>%
-  summarise(round(mean(TCY), 1), round(min(TCY), 1), round(max(TCY), 1))
-  
-```
-List of antibiotic acronymns with AMR
-
-## Converting disk diffusion zones and MICs
-
-See also https://msberends.github.io/AMR/reference/as.sir.html#arguments 
-
-Defaults to Eucast 2023 guidelines
-
-# Antibiogram tutorial from the AMR package
-
-```{r}
-head(example_isolates)
-abg <- antibiogram(
-  example_isolates,
-  add_total_n = TRUE, info = TRUE,
-  antibiotics = c(aminoglycosides(), carbapenems()),
-  ab_transform = "name"
+data <- tibble(
+  Source = c("Open community", "Surface freshwater", "Wild birds", "Chicken meat", "Bovine meat",
+             "Sheep and goat meat", "Pork", "Turkey meat", "Seafood", "Raw vegetables", "Chickens",
+             "Cattle", "Sheep and goats", "Pigs", "Dogs", "Cats", "Horses", "Clinical patients",
+             "Returning travellers", "Farmers"),
+  Prevalence = c(30, 10, 15, 50, 40, 35, 20, 15, 45, 55, 25, 10, 5, 12, 8, 6, 4, 15, 10, 20),
+  HumanExposure = c(50, 5, 8, 40, 35, 30, 18, 12, 50, 60, 22, 8, 3, 10, 6, 5, 3, 12, 8, 15)
 )
 
-abg
+# Convert prevalence to negative values for mirroring
+data <- data %>%
+  mutate(Prevalence = -Prevalence)
 
-autoplot(abg)
-
-
+# Create the mirrored bar chart
+ggplot(data) +
+  geom_col(aes(x = Prevalence, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.5) +  # Left side
+  geom_col(aes(x = HumanExposure, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.8) +  # Right side
+  geom_vline(xintercept = 0, linetype = "dashed") +  # Center line
+  labs(x = "ESBL-EC & pAmpC-EC prevalence (%)       |       Human exposure (%)",
+       y = "",
+       title = "Prevalence of ESBL-EC and pAmpC-EC in different sources",
+       caption = "Source: Sample Data") +
+  theme_minimal(base_size = 14)
 ```
+
+- Upset plot
+- Holly's code here
+- Sankey diagram Figure 4 Mughini-Gras
+
+## Day 5 - Local and Health Chickens Comparison
+
+- See Figure 2 Mughini-Gras
+
 Links to the AMR R package
 https://cran.r-project.org/web/packages/AMR/AMR.pdf
 
