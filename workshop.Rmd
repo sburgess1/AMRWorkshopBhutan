@@ -392,7 +392,9 @@ Check whether the distribution of disk diffusion values looks ok.
 
 ```{r}
 #Checking what the phenotype looks like, that there were no strange values.
+hist(ecoli_select$GEN, breaks = 20)
 hist(ecoli_select$GEN)
+abline(v = 14)
 hist(ecoli_select$CHL)
 hist(ecoli_select$MEM)
 hist(ecoli_select$CRO)
@@ -425,11 +427,7 @@ ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>%
   mutate(across(GEN:SXT, ~ as.sir(.x, guideline = "CLSI")))
 
 
-
 str(ecoli3)
-
-  
-            
 ```
 
 You can define your own breakpoints:
@@ -560,8 +558,8 @@ df2 <- df %>%
 
 
 #To keep disk diffusion columns and add new columns with SIR
-df3 <- df2 %>% mutate(across(GEN:VAN, ~ .x, .names = "{.col}_disk")) %>%
-  mutate(across(GEN:VAN, ~ as.sir(.x, guideline = "CLSI")))
+df3 <- df2 %>% mutate(across(GEN:LNZ, ~ .x, .names = "{.col}_disk")) %>%
+  mutate(across(GEN:LNZ, ~ as.sir(.x, guideline = "CLSI")))
 ```
 
 ***Exercise 2***
@@ -756,7 +754,7 @@ mic_breaks <- c(0, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, Inf)
 mic_labels <- c("0.25", "0.5", "1", "2", "4", "8", "16", "32", "64", "128")
 
 # Create the frequency table
-mic_table <- my_data %>%
+mic_table <- dat %>%
   mutate(MIC = as.numeric(MIC)) %>%
   mutate(MIC_category = cut(MIC, breaks = mic_breaks, labels = mic_labels, right = FALSE)) %>%
   group_by(Antibiotic, Animal) %>%
@@ -765,7 +763,7 @@ mic_table <- my_data %>%
 
 #write.table(mic_table, file = "output/mic.txt", row.names = FALSE)
 
-my_data %>%
+dat %>%
   group_by(Antibiotic, Animal) %>%
   reframe(
     MIC_min = min(MIC),
@@ -782,30 +780,88 @@ Material for the following tutorial was taken from https://msberends.github.io/A
 The number of MDR isolates can be determined using the mdro() function. Use the example_isolates  
 
 ```{r}
-x <- mdro(example_isolates, guideline = "EUCAST")
+x <- mdro(example_isolates, guideline = "EUCAST", pct_required_classes = 0.5)
 table(x)
 
 example_isolates %>%
   mdro() %>%
   freq()
+
+example_isolates %>%
+  mutate(MDRO = x) %>%
+  group_by(mo) %>%  # Use mo_species if you want species-level
+  count(MDRO)
+
+antibiotics %>%
+  select(ab, group) %>%
+  filter(ab == "GEN" | ab =="CHL" | ab =="MEM" | ab =="CRO" | ab =="CIP" | ab =="FEP" | ab =="NAL" | ab =="AMP" | ab =="TCY" | ab =="SXT" | ab =="ETP" | ab =="ERY" | ab =="TGC" | ab =="QDA" | ab =="VAN" | ab =="LNZ")
+
+y <- mdro(df3, guideline = "EUCAST", pct_required_classes = 0.1)
+df3 %>%
+  mutate(MDRO = y) %>%
+  group_by(species) %>%  # Use mo_species if you want species-level
+  count(MDRO)
+
+df3_mdr <- df3 %>%
+  mutate(MDRO = y)
+
+# Filter for MDR isolates
+df3_mdr %>% filter(MDRO == "Positive")
+
+
+
 ```
-- Determining MDR and barplot resistance to n antibiotic classes
+
+
+# Principal Component analysis 
+
+Note 30 observations are required for each grouped variable.
 
 ```{r}
-```
-- Scatterplot correlations (Use Natalia's data)
+set.seed(123)
+resistance_data <- example_isolates %>%
+  group_by(
+    order = mo_order(mo), # group on anything, like order
+    genus = mo_genus(mo)
+  ) %>% #  and genus as we do here
+  summarise_if(is.sir, resistance) %>% # then get resistance of all drugs
+  select(
+    order, genus, AMC, CXM, CTX,
+    CAZ, GEN, TOB, TMP, SXT
+  ) # and select only relevant columns
 
-```{r}
-```
-- Principal Component analysis 
+pca_result <- pca(resistance_data)
 
-```{r}
+summary(pca_result)
+
+ggplot_pca(pca_result)
+
+##Using the Surveillance data
+##This isn't a very good example.
+
+pca_df <- df3 %>%
+  filter(species == "Enterococcus sp.") %>%
+  group_by(sample_collection) %>%
+  summarise_if(is.sir, resistance) %>%
+  select(sample_collection, CHL, AMP, TCY, ERY, VAN)# then get resistance of all drugs
+  # and select only relevant columns
+
+pca_result <- pca(pca_df)
+
+summary(pca_result)
+
+ggplot_pca(pca_result)
 ```
 
 ## Day 4 - Plotting
 
 The main structure for generating a ggplot is:
-ggplot(data = <dataframe> + geom<name>(mapping = aes(x = <x_variable>, y = <y_variable>, color = <variable_for_color>)))
+
+ggplot(data = <dataframe> + 
+
+geom<name>(mapping = aes(x = <x_variable>, y = <y_variable>, color = <variable_for_color>)) +
+
+labs(x = <x_axis_label>, y = <y_axis_label>))
 
 See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnwRfLe0w_2eaf49b2cfcf450db2f2bb95681f55f1_03_01grammarofgraphics.html?Expires=1741046400&Signature=CP49Mmw63hpCBlR5IBPO~We~0Djsy5Qox2zfzNyAISHCWkq6Amnqz6o8-1mcao8FBsA0hOvT4iKd7VARcOBVj5aamI6GMNxPgb2MDld2udjVFGQZu-4RNp0kKCEg693bmJOf6ryogLAXgKPEUT9-dVZ852EnOk-0iZU89PVvt7w_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) from the arranging and visualising coursera course. 
 
@@ -813,14 +869,17 @@ See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnw
 
 ```{r ggplot}
 ggplot(data = ecoli3) +
-  geom_point(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category))
+  geom_point(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
+  labs(x = "Collection date", y = "Zone size (mm)" )
 
 ggplot(data = ecoli3) +
-  geom_line(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category))
+  geom_line(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
+  labs(x = "Collection date", y = "Zone size (mm)" )
 
 ggplot(data = ecoli3) + 
   geom_histogram(mapping = aes(x = CHL_disk), 
-                 binwidth = 2)
+                 binwidth = 2) +
+  labs(x = "Zone size (mm)", y = "Frequency" )
 
 df4 <- df3 %>%
   filter(species == "Escherichia coli") %>%
@@ -828,18 +887,22 @@ df4 <- df3 %>%
 
 #Barplot with counts
 ggplot(data = df4) + 
-  geom_bar(mapping = aes(x = sample_collection, fill = CHL))
+  geom_bar(mapping = aes(x = sample_collection, fill = CHL)) +
+  labs(x = "Sample collection point", y = "Isolate count" )
 
 ggplot(data = df4) + 
   geom_bar(mapping = aes(x = sample_collection, fill = CHL)) +
-  coord_flip()
+  coord_flip() +
+  labs(x = "Isolate count", y = "Sample collection point")
 
 #Barplot with proportion
 ggplot(data = df4) + 
-  geom_bar(mapping = aes(x = sample_collection, fill = CHL), position = "fill")
+  geom_bar(mapping = aes(x = sample_collection, fill = CHL), position = "fill") +
+  labs(x = "Sample collection point", y = "Proportion" )
 
 ggplot(data = df4) + 
-    geom_boxplot(mapping = aes(x = CHL_disk, y = sample_collection))
+  geom_boxplot(mapping = aes(x = CHL_disk, y = sample_collection)) +
+  labs(x = "Zone size", y = "Sample collection point" )
 ```
 
 
@@ -872,8 +935,8 @@ ggplot(my_data,
        aes(x = group, y = MIC, colour = SIR)) +
   geom_jitter(width = 0.2, size = 2) +
   geom_boxplot(fill = NA, colour = "grey40") +
-  scale_y_mic() +
-  scale_colour_sir() +
+  #scale_y_mic() +
+  #scale_colour_sir() +
   labs(title = "MIC Distribution and SIR Interpretation",
        x = "Sample Groups",
        y = "MIC (mg/L)")
@@ -1005,9 +1068,70 @@ ggplot(data) +
   theme_minimal(base_size = 14)
 ```
 
-- Upset plot
+**Upset plots**
+
+```{r}
+library(ComplexUpset) 
+
+upset <- read_csv("data/upset.csv")
+
+#Generate a character vector with the antibiotic abbreviations
+antibiotics <- c("CTX","T", "CIP", "S")
+
+#Assign names to the elements of the antibiotics vector
+names(antibiotics) <- antibiotics
+antibiotics
+
+str(upset)
+#Convert the Region2 column to a factor
+upset$Region2 <- factor(upset$Region2)
+str(upset)
+
+#Create a colour
+myPalette <- palette(c( "#1F77B4", "#2CA02C", "#9467BD", "#E377C2", "#7F7F7F"))
+
+# constructing the plot with ggplot2
+
+upset(upset,
+  
+  antibiotics,
+  
+  
+  base_annotations=list(
+    
+    'Intersection size'=intersection_size(
+      
+      counts=TRUE,
+      
+      mapping=aes(fill=Region2)
+      
+    ) 
+    + geom_bar(stat="identity") 
+    
+    + ylab('Number of isolates')
+    
+    + labs(fill = "Region2") 
+    
+  ),
+  
+  width_ratio=0.1,
+  
+  stripes='white'
+  
+) & scale_fill_manual(values = myPalette) 
+
+```
+
 - Holly's code here
-- Sankey diagram Figure 4 Mughini-Gras
+```{r}
+```
+
+- Scatterplot correlations (Use Natalia's data)
+```{r}
+```
+
+```{r}
+```
 
 ## Day 5 - Local and Health Chickens Comparison
 
@@ -1016,9 +1140,11 @@ ggplot(data) +
 Links to the AMR R package
 https://cran.r-project.org/web/packages/AMR/AMR.pdf
 
-Links to other useful tutorials
+Links to other useful tutorials and resources
 
 For dates and times see https://r4ds.had.co.nz/dates-and-times.html 
+
+https://r-graph-gallery.com/
 
 References
 
