@@ -1,5 +1,5 @@
 ---
-title: "AMR tutorial"
+title: "R tutorial for analysising AMR phenotypic data"
 author: "Sara Burgess"
 date: "`r Sys.Date()`"
 output: html_document
@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 ## Day 1 
 
 #### Setting up an R project
@@ -26,6 +27,8 @@ Browse to project directory
 
 Open <project_name>.Rproj file
 
+<br>
+<br>
 
 #### Terminology
 
@@ -56,11 +59,14 @@ help(read.csv)
 
 **Tidyverse** A collection of easy to use R packages designed for data scientists to carry out data analyses such as tidying, manipulating and plotting data.
 
-See https://bookdown.org/amy_yarnell/T32-book/selected-glossary-of-r-terminology.html for some more defintions. 
 
-### Installing and loading packages
+<br>
+<br>
 
-Install the R packages AMR, tidyverse, and readxl
+#### Installing and loading packages
+
+
+Install the R packages AMR, tidyverse, cleaner and readxl.
 
 New packages can be installed by selecting:
 
@@ -77,8 +83,6 @@ install.packages("cleaner")
 
 Load the packages.
 
-Note: Packages will need to loaded at the beginning of each R session. 
-
 ```{r, results='hide', collapse=TRUE, message=FALSE}
 library(AMR)
 library(tidyverse)
@@ -86,10 +90,12 @@ library(readxl)
 library(cleaner)
 ```
 
+Note: Packages will need to loaded at the beginning of each R session. 
 
-## Tidying and checking data
+<br>
+<br>
 
-### Reading in data
+#### Reading in data
 
 Read in a csv file using base R
 
@@ -113,13 +119,36 @@ campy <- read_csv("data/Campylobacter_117v2.csv")
 
 The advantages of using read_csv are: you do not need to specify that the first line of data are column names, it is faster and it provides more information on the file you are reading.
 
-Readin an excel sheet using the readxl package.
+Read in an excel sheet using the readxl package.
 
 ```{r read}
 ecoli <- read_excel("data/Bh_AMR_Surveillance data.xlsx", sheet = "E.coli")
 ```
 
-### Check your data
+<br>
+<br>
+#### Check your data
+
+The function str() is probably the most important function in R for checking the structure of your data. This gives you information on the number of rows and columns, the names of your columns, the class of each column.
+
+```{r}
+str(ecoli)
+```
+
+Use the functions head(), tail(), glimpse(), summary() and table() to check your data. How are these functions different?
+
+```{r}
+head(ecoli)
+tail(ecoli)
+glimpse(ecoli)
+summary(ecoli)
+table(ecoli$'Name of meat shop', useNA = "ifany")
+```
+
+
+<br>
+<br>
+#### Tidying your data
 
 Some recommendations for "tidy data" include:
 
@@ -135,25 +164,6 @@ Some recommendations for "tidy data" include:
 
 * Each observation results in one row
 
-The function str() is probably the most important function in R for checking the structure of your data. This gives you information on the number of rows and columns, the names of your columns, the class of each column. 
-
-```{r}
-str(ecoli)
-```
-
-Use the functions head(), tail(), glimpse(), summary() and table() to check your data.
-
-```{r}
-head(ecoli)
-tail(ecoli)
-glimpse(ecoli)
-summary(ecoli)
-table(ecoli$'Name of meat shop', useNA = "ifany")
-```
-
-How are these functions different?
-
-### Tidying your data
 
 ***Group activity***
 
@@ -234,6 +244,10 @@ ecoli %>% rename(meatshop = `Name of meat shop`,
 
 Some of the dates look like they may be in an excel serial date format. There are methods in R that you can use to format the dates into the same format. 
 
+```{r date}
+ecoli_select$date_collection
+```
+
 ```{r, eval = FALSE, results='hide', echo=FALSE}
 ec_test <- ecoli_select %>%
   mutate(date_collection = as.character(date_collection),  # Convert to character
@@ -281,7 +295,7 @@ table(ecoli_select$meat_shop, useNA = "ifany")
 table(ecoli_select$meat_shop %in% c("AM MS", "DB MS", "GM MS"))
 ```
 
-Use the sort and unique functions to check the meath_shop categorical variable values.
+Use the sort and unique functions to check the meat_shop categorical variable values.
 
 ```{r}
 sort(unique(ecoli_select$meat_shop))
@@ -338,7 +352,9 @@ ecoli_select <- mutate(ecoli_select, farm_category = str_to_title(farm_category)
 unique(ecoli_select$farm_category)
 ```
 
-### Missing values
+<br>
+<br>
+#### Missing values
 
 Check whether there are any missing values. These are labelled as NA (meaning not available) in R.
 
@@ -368,14 +384,18 @@ all(ecoli_select$TCY >= 6)
 To remove all rows with missing values use the complete.cases function.
 
 ```{r}
+dim(campy)
+
+campy <- campy %>%
+   filter(complete.cases(.))
+
 ```
 
 To only remove rows where there are missing values in a specific column use the drop_na function
 
 ```{r}
 
-
-#drop_na(maths)
+drop_na(campy, 'Sample ID')
 
 ```
 
@@ -386,7 +406,10 @@ Alternatively missing values can be removed when when applying a function. For e
 mean(ecoli_select$TCY, na.rm = TRUE)
 ```
 
-### Data distribution
+<br>
+<br>
+<br>
+#### Data distribution
 
 Check whether the distribution of disk diffusion values looks ok. 
 
@@ -406,14 +429,17 @@ hist(ecoli_select$TCY)
 hist(ecoli_select$SXT)
 ```
 
+<br>
+<br>
 ## Day 2: Using the AMR R package
 
-### Generating an antibiogram
+#### Generating an antibiogram
 
-First the disk diffusion data is converted to "disk" data type and a new column  is generated using the mutate_if() function for the SIR data. In the example below the disk diffusion values are converted to S, I or R based on the latest CLSI guidelines. You can change the AMR guideline using the guideline argument e.g. guideline == "CLSI 2023".
+First the disk diffusion data is converted to "disk" data type and a new column  is generated using the mutate_if() function for the SIR data. The is.disk() function is used to check whether the data is "disk" class and if true the as.sir() function is used to convert the disk diffusion values to "SIR" type.  In the example below the disk diffusion values are converted to S, I or R based on the latest CLSI guidelines. You can change the AMR guideline using the guideline argument e.g. guideline == "CLSI 2023".
 
 ```{r}
 #Convert to "disk" data type
+str(ecoli_select)
 ecoli2 <- ecoli_select %>%
   mutate(across(GEN:SXT, as.disk))
 str(ecoli2)
@@ -430,7 +456,7 @@ ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>%
 str(ecoli3)
 ```
 
-You can define your own breakpoints:
+To define your own breakpoints:
 
 ```{r}
 #generating an example dataframe
@@ -443,16 +469,19 @@ dat <- data.frame(
   TCY = c(6.6, 7.2, 19.3, 17.2),
   STR = c(6.6, 12.5, 7.2, 17.2)
     )
+str(dat)
 
-#To define my own breakpoints
+#To define breakpoints
 dat <- dat %>%
-  mutate(across(CTX:STR, as.disk))%>% 
+  mutate(across(CTX:STR, as.disk))%>% # convert values to data class "disk"
   mutate(STR = case_when(
     STR >= 15 ~ "S",  # Replace with your own breakpoints
     STR < 12 ~ "R",
     TRUE ~ "I"       # Intermediate
   )) %>%
-  mutate_if(is.disk, as.sir, guideline = "CLSI")
+  mutate_if(is.disk, as.sir, guideline = "CLSI")  #Convert disk columns to SIR class 
+
+str(dat)
 ```
 
 To specify that you want to use the veterinary breakpoints (rather than human).
@@ -467,16 +496,17 @@ Next generate an antibiogram:
 ```{r}
 
 ant <- antibiogram(ecoli3,
-            antibiotics = c("GEN", "CHL", "MEM", "CRO", "CIP", 
+            antibiotics = c("GEN", "CHL", "MEM", "CRO", "CIP", #select antibiotics to include in antibiogram
                            "FEP", "NAL", "AMP", "TCY", "SXT"), 
-            ab_transform = "name",
+            ab_transform = "name", #transform antibioitc abbreviations into full names
             digits = 1)  # Show one decimal place
 
 ant
 ```
 
-Make a basic plot of the antibiograms using the autoplot() function.
+The antibioram displays the percentage that are sensitive or intermediate.
 
+Make a basic plot of the antibiograms using the autoplot() function.
 
 ```{r}
 
@@ -560,6 +590,8 @@ df2 <- df %>%
 #To keep disk diffusion columns and add new columns with SIR
 df3 <- df2 %>% mutate(across(GEN:LNZ, ~ .x, .names = "{.col}_disk")) %>%
   mutate(across(GEN:LNZ, ~ as.sir(.x, guideline = "CLSI")))
+
+str(df3)
 ```
 
 ***Exercise 2***
@@ -630,7 +662,10 @@ df3 %>%
 ```
 
 
-## Confidence Intervals 
+<br>
+<br>
+
+#### Confidence intervals 
 
 Use the AMR package function sir_confidence_interval() to calculate confidence intervals. This function uses the Clopper-Pearson method (using the binom.test())
 
@@ -659,22 +694,27 @@ df_summary <- ecoli3 %>%
 
 ## Day 3 - Using the AMR R Package
 
-
-# First isolates
+#### First isolates
 
 Material for the following tutorial was taken from  https://msberends.github.io/AMR/articles/AMR.html#first-isolates. 
 
-When there are multiple isolates from the same sample the function first_isolate() can be used to correct for duplicate isolates. There are four different methods for that can be used for selecting the isolate(s) as described by [Hindler et al. (2007)] (https://academic.oup.com/cid/article/44/6/867/364325). The default method is phenotype-based. The other three options are "episode-based", "patient-based" and "isolate-based". 
+When there are multiple isolates from the same sample the function first_isolate() can be used to correct for duplicate isolates. There are four different methods for that can be used for selecting the isolate(s) as described by [Hindler et al. (2007)](https://academic.oup.com/cid/article/44/6/867/364325). The default method is phenotype-based. The other three options are "episode-based", "patient-based" and "isolate-based". 
 
-```{r}
+Use the data set "example_isolates" that comes with the AMR package select the patient, ward, date, mo, AMX, AMC, CXM columns and filter for complete cases.
+
+```{r, results='hide', echo = FALSE}
 our_data <- example_isolates %>% 
   select(patient, ward, date, mo, AMX, AMC, CXM) %>%
   filter(complete.cases(.))
+```
 
+Select first isolates based on the phenotype method.
+
+```{r}
 str(our_data)  
 
 our_data %>%
-  mutate(first = first_isolate())
+  mutate(first = first_isolate()) #add a new column called first. Returns true if meets criteria of first isolate
 
 our_data %>%
   mutate(first = first_isolate(method = "phenotype-based"))
@@ -685,18 +725,18 @@ Look at the different arguments available for the first_isolate function using ?
 ```{r}
 
 our_data %>%
-  mutate(first = first_isolate(method = "phenotype-based", type = "points", points_threshold = 1))
+  mutate(first = first_isolate(method = "phenotype-based", type = "points", points_threshold = 1)) #Change the points threshold
 
 our_data %>%
   mutate(first = first_isolate(method = "episode-based", episode_days = 7)) # 7 day interval from initial isolate
 
 our_data %>%
-  mutate(first_isolate(type = "keyantimicrobials", points_threshold = 1, col_keyantimicrobials = "AMX"))
+  mutate(first_isolate(type = "keyantimicrobials", points_threshold = 1, col_keyantimicrobials = "AMX")) #Specificy which antimicrobial is used to identify first isolate
 
 
 ```
 
-Once you have decided which method you are going to use to determine the "first isolates", filter the dataframe. 
+Once you have decided which method you are going to use to determine the "first isolates", filter the dataframe and count the number of isolates in the dataset before and after using the first_isolate() function.
 
 ```{r}
 
@@ -704,17 +744,25 @@ our_data1 <- our_data %>%
   mutate(first = first_isolate(method = "phenotype-based", type = "points", points_threshold = 1)) %>%
   filter_first_isolate()
 
+#Counts before selecting first isolates
 our_data %>%
   count(mo_name(mo), sort = TRUE)
 
+#Counts after filtering for first isolates
 our_data1 %>%
   count(mo_name(mo), sort = TRUE)
+```
 
+Filter the first isolate data for those isolates that are resistant to any beta lactams.
+
+```{r}
 our_data1 %>%
   filter(all(betalactams() == "R"))
 ```
 
-# MIC frequency distribution 
+<br>
+<br>
+#### MIC frequency distribution 
 
 Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/AMR.html#interpreting-mic-and-disk-diffusion-values
 
@@ -725,8 +773,6 @@ set.seed(123)
 
 #MIC values randomly generated
 mic_values <- random_mic(100)
-
-
 
 #MIC values converted to SIR
 sir_values <- as.sir(mic_values, mo = "K. pneumoniae", ab = "cipro", guideline = "EUCAST 2023")
@@ -740,7 +786,7 @@ autoplot(mic_values)
 autoplot(mic_values, mo = "K. pneumoniae", ab = "cipro", guideline = "EUCAST 2023")
 ```
 
-The AMR R package cannot be used to generate an MIC frequency table so here dyply has been used to generate this table. 
+The AMR R package cannot be used to generate an MIC frequency table so here dply has been used to generate this table. 
 
 ```{r}
 mic_values <- random_mic(90, mo = "Escherichia coli")
@@ -773,7 +819,9 @@ dat %>%
 
 ```
 
-# Determining multi-drug resistance
+<br>
+<br>
+### Determining multi-drug resistance
 
 Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/MDR.html
 
@@ -812,8 +860,9 @@ df3_mdr %>% filter(MDRO == "Positive")
 
 ```
 
-
-# Principal Component analysis 
+<br>
+<br>
+### Principal Component analysis 
 
 Note 30 observations are required for each grouped variable.
 
@@ -853,7 +902,11 @@ summary(pca_result)
 ggplot_pca(pca_result)
 ```
 
+<br>
+<br>
 ## Day 4 - Plotting
+
+ggplots are made up of geoms and aesthetics. The geoms are the way in which the data is plotted e.g. points, lines, bars. The aesthetics (aes) are the way in which data is mapped to things like the size shape and colour. 
 
 The main structure for generating a ggplot is:
 
@@ -865,6 +918,10 @@ labs(x = <x_axis_label>, y = <y_axis_label>))
 
 See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnwRfLe0w_2eaf49b2cfcf450db2f2bb95681f55f1_03_01grammarofgraphics.html?Expires=1741046400&Signature=CP49Mmw63hpCBlR5IBPO~We~0Djsy5Qox2zfzNyAISHCWkq6Amnqz6o8-1mcao8FBsA0hOvT4iKd7VARcOBVj5aamI6GMNxPgb2MDld2udjVFGQZu-4RNp0kKCEg693bmJOf6ryogLAXgKPEUT9-dVZ852EnOk-0iZU89PVvt7w_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) from the arranging and visualising coursera course. 
 
+[ggplot2 website](https://ggplot2.tidyverse.org/)
+
+The ggplot2 book by Hadley Wickham. 
+
 ***Some basic examples of plots***
 
 ```{r ggplot}
@@ -872,6 +929,24 @@ ggplot(data = ecoli3) +
   geom_point(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
   labs(x = "Collection date", y = "Zone size (mm)" )
 
+ggplot(data = ecoli3) +
+  geom_point(mapping = aes(x = date_collection, y = CHL_disk, shape = farm_category)) +
+  labs(x = "Collection date", y = "Zone size (mm)" )
+
+ggplot(data = ecoli3) +
+  geom_point(mapping = aes(x = date_collection, y = CHL_disk)) +
+  facet_wrap(.~farm_category) +
+  labs(x = "Collection date", y = "Zone size (mm)" )
+
+ggplot(data = ecoli3) +
+  geom_point(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
+  geom_smooth(mapping = aes(x = date_collection, y = CHL_disk)) +
+  labs(x = "Collection date", y = "Zone size (mm)" )
+```
+
+In the above example by adding in the smooth geom it adds in an overall trend line  as well as the 95% confidence intervals for that line, which are represented by the gray zone.
+
+```{r}
 ggplot(data = ecoli3) +
   geom_line(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
   labs(x = "Collection date", y = "Zone size (mm)" )
@@ -931,19 +1006,27 @@ ggplot(ecoli3,
 # add a group
 my_data$group <- rep(c("A", "B", "C", "D"), each = 25) 
 
+my_data$MIC <- as.numeric(my_data$MIC)
+
 ggplot(my_data,
        aes(x = group, y = MIC, colour = SIR)) +
   geom_jitter(width = 0.2, size = 2) +
   geom_boxplot(fill = NA, colour = "grey40") +
-  #scale_y_mic() +
-  #scale_colour_sir() +
   labs(title = "MIC Distribution and SIR Interpretation",
        x = "Sample Groups",
        y = "MIC (mg/L)")
 
 ```
 
-## Plots for publications
+<br>
+<br>
+### Plots for publications
+
+Use theme() function for things that relate to the entire plot e.g. background colour. 
+
+alpha changes the transparency of the colour. 
+
+Assigning colour to a constant colour versus assinging it to a variable. If assigning it to a variable it has to wrapped within the aes function. 
 
 ```{r}
 
@@ -1059,16 +1142,27 @@ data <- data %>%
 # Create the mirrored bar chart
 ggplot(data) +
   geom_col(aes(x = Prevalence, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.5) +  # Left side
-  geom_col(aes(x = HumanExposure, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.8) +  # Right side
+  geom_col(aes(x = HumanExposure, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.8) +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
   geom_vline(xintercept = 0, linetype = "dashed") +  # Center line
-  labs(x = "ESBL-EC & pAmpC-EC prevalence (%)       |       Human exposure (%)",
+  labs(x = "ESBL prevalence (%)       |       Human exposure (%)",
+       y = "") +
+  theme_minimal(base_size = 14)
+
+ggplot(data) +
+  geom_col(aes(x = Prevalence, y = reorder(Source, Prevalence), fill = -Prevalence), alpha = 0.8) +  # Left side
+  geom_col(aes(x = HumanExposure, y = reorder(Source, Prevalence), fill = HumanExposure), alpha = 0.8) +  # Right side
+  geom_vline(xintercept = 0, linetype = "dashed") +  # Center line
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +  # Gradient from light to dark blue
+  labs(x = "ESBL prevalence (%)       |       Human exposure (%)",
        y = "",
-       title = "Prevalence of ESBL-EC and pAmpC-EC in different sources",
-       caption = "Source: Sample Data") +
+       fill = "Prevalence/Exposure (%)") +
   theme_minimal(base_size = 14)
 ```
 
-**Upset plots**
+<br>
+<br>
+###Upset plots
 
 ```{r}
 library(ComplexUpset) 
@@ -1122,25 +1216,77 @@ upset(upset,
 
 ```
 
-- Holly's code here
+<br>
+<br>
+### Visualising pairwise relationships
+
+This code was adapted by Patrick Biggs and Natalia Gonzalez from https://stackoverflow.com/questions/20872133/using-stat-binhex-with-ggpairs 
+
+It generates a multi-panel grid plot with a density plot (showing the data distribution) on the diagonal, correlation values in the upper right triangle and hexbin density plots in the lower left triangle.
+
+```{r}
+#Load libraries
+library(hexbin)
+library(GGally)
+library(ggcorrplot)
+
+#Read in data
+c <- read_csv(("data/Ecoli_Complete.csv"))
+
+#Look at the structure of the data
+str(c)
+summary(c)
+
+#delete the first column, leaving the numeric values. 
+c <- c[-1]
+
+
+## Remove rows with NA values
+c_clean <- na.omit(c)
+
+
+## Make function for generating scatterplots and correlation values for pairs of antibiotics 
+ggpairs_hex <- function(df, hexbins = 30) { #define the function named ggpairs_hex which will take the the arguments df and hexbins. The default value for hexagonal binnng is 30
+  # REF: https://stackoverflow.com/questions/20872133/using-stat-binhex-with-ggpairs
+  p <- ggpairs(df, lower="blank", #the lower triangle (below the diagonal) is blank
+               upper = list(continuous = wrap("cor", color = "black", stars = FALSE))) #ggpairs (from the package GGally) the upper triangle of the grid displays the (Pearson) correlation value in black. wrap allows multiple parameters to pass to the "cor" function
+  seq <- 1:ncol(df) #generate vector called seq with the numbers 1 through to the number of columns
+  for (x in seq) #loop over the x-axis variables
+    for (y in seq) #loop over y-axis variable
+      if (y>x)  #only fill the upper triangle
+        p <- putPlot(p, #putplot() function used to insert the new plot below into the lower triangle position putPlot(ggpairs_object, new_plot, row, col)
+                     ggplot(df, aes_string(x=names(df)[x], y=names(df)[y])) + #assign x and y variables
+                       stat_binhex(bins = hexbins) + #Create a hexbin  density plot (instead of a scatter plot) 2D histogram
+                       scale_fill_gradient(low='coral', high='darkblue'), #Colour points from light to dark
+                     y,  x)
+  return(p)
+}
+
+#Run the function with your dataframe
+ggpairs_hex(c_clean) 
+```
+
 ```{r}
 ```
 
-- Scatterplot correlations (Use Natalia's data)
-```{r}
-```
+<br>
+<br>
+## Day 5 - Local and Healthy Chickens Comparison
 
-```{r}
-```
+1. Generate tables and plots to compare local chicken AST results with healthy chicken. 
 
-## Day 5 - Local and Health Chickens Comparison
+2. Finish generating plots from your own data.
 
-- See Figure 2 Mughini-Gras
+3. Present plots to the group
+
+<br>
+<br>
+## Useful links to other tutorials and resources
 
 Links to the AMR R package
 https://cran.r-project.org/web/packages/AMR/AMR.pdf
 
-Links to other useful tutorials and resources
+See https://bookdown.org/amy_yarnell/T32-book/selected-glossary-of-r-terminology.html for some more definitions. 
 
 For dates and times see https://r4ds.had.co.nz/dates-and-times.html 
 
