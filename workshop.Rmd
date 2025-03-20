@@ -1,5 +1,5 @@
 ---
-title: "R tutorial for analysising AMR phenotypic data"
+title: "R tutorial for analysing AMR phenotypic data"
 author: "Sara Burgess"
 date: "`r Sys.Date()`"
 output: html_document
@@ -32,7 +32,7 @@ Open <project_name>.Rproj file
 
 #### Terminology
 
-***Function*** 
+***Function*** :It takes arguments as the input, processes them using a set of operations, and returns an output.
 
 To find out the arguments of a function use ? or help
 
@@ -41,23 +41,34 @@ To find out the arguments of a function use ? or help
 help(read.csv)
 ```
 
-***Argument*** : The expressions that are passed into a function
+***Argument*** : The expressions that are passed into a function.
 
 ***Assignment operator*** <- Assigns the values/data frame, vector, list etc... on the right to the object on the left. 
 
-***Object***
+***Object*** : All items that are stored in R are considered objects. They can be a number, vector, dataframe, function etc... These are assigned to an object using <-.
 
-***Data frame***
+***Data frame*** : Data displayed in a 2-dimensional like table. 
 
-***Vector***
+***Tibble***: A modern version of a data frame used by the tidyverse package. See https://tibble.tidyverse.org/. 
 
-**Pipe Operator*** %>% chains together several operation so that the result of the previous line feeds into the subsequent line. 
+***Vector*** : 1-dimensional data array.
 
-***Package***
+```{r}
+# Numeric vector
+num_vec <- c(1, 2, 3, 4, 5)
 
-***Tibble***
+# Character vector
+char_vec <- c("carrot", "cabbage", "onion")
 
-**Tidyverse** A collection of easy to use R packages designed for data scientists to carry out data analyses such as tidying, manipulating and plotting data.
+# Logical vector
+log_vec <- c(TRUE, FALSE, TRUE)
+```
+
+***Pipe Operator*** %>% chains together several operations so that the result of the previous line feeds into the subsequent line. 
+
+***Package*** : Collection of functions, code, data etc... to perform particular tasks. 
+
+***Tidyverse*** A collection of easy to use R packages designed for data scientists to carry out data analyses such as tidying, manipulating and plotting data.
 
 
 <br>
@@ -127,6 +138,7 @@ ecoli <- read_excel("data/Bh_AMR_Surveillance data.xlsx", sheet = "E.coli")
 
 <br>
 <br>
+
 #### Check your data
 
 The function str() is probably the most important function in R for checking the structure of your data. This gives you information on the number of rows and columns, the names of your columns, the class of each column.
@@ -148,6 +160,7 @@ table(ecoli$'Name of meat shop', useNA = "ifany")
 
 <br>
 <br>
+
 #### Tidying your data
 
 Some recommendations for "tidy data" include:
@@ -181,10 +194,10 @@ The first step in tidying your data could be selecting the columns of interest (
 
 ```{r}
 #Select by column number
-select(ecoli, 16:18)
+select(ecoli, 13:15)
 
 #Select by column name 
-select(ecoli, Stratification, 'Location Name', 'Sample type')
+select(ecoli, Stratification, 'Dzongkhag (sample source)', 'Sample type')
 ```
 
 Use the select function to remove the SIR columns (which contain no values) and assign it the object "ecoli_select".
@@ -198,7 +211,7 @@ str(ecoli_select)
 To only keep rows that match a certain condition the filter() function can be used.
 
 ```{r}
-filter(ecoli, `Location Name` == "Babesa")
+filter(ecoli, `Dzongkhag (sample source)` == "Thimphu")
 ```
 
 Multiple functions can also be chained together using %>%. In the example below the dataframe is piped into the select() function, which is used to select the columns of interest then the result from this is piped into the filter function, which is used to select those rows where the zone diameter for tetracycine is less than 15 mm. 
@@ -206,7 +219,7 @@ Multiple functions can also be chained together using %>%. In the example below 
 ```{r}
 
 ecoli %>%
-  select(`Location Name`, `Sample ID`, `Tetracyclin (30µg)`) %>%
+  select(`Dzongkhag (sample source)`, `Sample ID`, `Tetracyclin (30µg)`) %>%
   filter(`Tetracyclin (30µg)` < 15)
   
 ```
@@ -217,7 +230,7 @@ Rename the columns so that they are simple, informative, and do not contain any 
 
 ```{r}
 #Rename columns
-colnames(ecoli_select) <- c("meatshop", "stratification", "location", "GPSx", "GPSy", "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_other_meat", "sampleID", "FTLcode", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
+colnames(ecoli_select) <- c("meatshop", "stratification", "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_other_meat", "sampleID", "FTLcode", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
 ```
 
 In the above example the antibiotic names have been changed to their abbreviated form. Check the abbreviation that is used by the AMR package for streptomycin
@@ -236,7 +249,6 @@ Alternatively to rename specific columns use the rename() function.
 
 ```{r}
 ecoli %>% rename(meatshop = `Name of meat shop`,
-                 location = `Location Name`,
                  sample_collection = `Date of sample collection`)
 ```
 
@@ -268,17 +280,16 @@ ecoli <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "E.coli")
 #Remove columns starting with SIR, change column names and add a new column with species                    
 ecoli_select <- ecoli %>% 
   select(!starts_with("SIR")) %>%
-  setNames(c("meat_shop", "stratification", "location_name", "GPS_x", "GPS_y", 
-             "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
-             "sample_source", "farm_category", "slaughter", "transportation", 
-             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", 
-             "GEN", "CHL", "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT"))  %>%
+  setNames(c("meat_shop", "stratification", "date_collection", "sample_type",
+             "sample_collection", "sample_weight_Kg", "sample_source",
+             "farm_category", "slaughter", "transportation", "transport_medium",
+             "transport_with_other_meat", "sample_ID", "FTL_code", "GEN", "CHL",
+             "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT"))  %>%
   mutate(species = "Escherichia coli") # add in a column called species
 
 str(ecoli_select)
 
-#Change to date format
-library(lubridate)
+#Change to date format (using lubridate library)
 ecoli_select$date_collection <- ymd(ecoli_select$date_collection)
 ```
 
@@ -304,14 +315,14 @@ sort(unique(ecoli_select$meat_shop))
 The base R function gsub() and the str_replace functions from the stringr packages can be used to replace strings.
 
 Use gsub to remove "."
-```{r}
+```{r gsub}
 
 gsub("\\.", "", ecoli_select$meat_shop)
 ```
 
 Use str_replace to remove the "." and replace "Bebak MS with BK MS" and assign to the object ecoli_select.
 
-```{r}
+```{r str_replace}
 
 ecoli_select <- ecoli_select %>%
   mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
@@ -329,7 +340,7 @@ Check whether any of the other categorical values need to be changed and change 
 
 The farm_category column uses both a capital "C" and a lowercase "c" has been used for the word commercial. 
 
-```{r}
+```{r unique}
 sort(unique(ecoli_select$farm_category))
 ```
 
@@ -354,6 +365,7 @@ unique(ecoli_select$farm_category)
 
 <br>
 <br>
+
 #### Missing values
 
 Check whether there are any missing values. These are labelled as NA (meaning not available) in R.
@@ -389,6 +401,8 @@ dim(campy)
 campy <- campy %>%
    filter(complete.cases(.))
 
+dim(campy)
+
 ```
 
 To only remove rows where there are missing values in a specific column use the drop_na function
@@ -409,6 +423,7 @@ mean(ecoli_select$TCY, na.rm = TRUE)
 <br>
 <br>
 <br>
+
 #### Data distribution
 
 Check whether the distribution of disk diffusion values looks ok. 
@@ -431,6 +446,7 @@ hist(ecoli_select$SXT)
 
 <br>
 <br>
+
 ## Day 2: Using the AMR R package
 
 #### Generating an antibiogram
@@ -445,8 +461,7 @@ ecoli2 <- ecoli_select %>%
 str(ecoli2)
 
 #To convert disk diffusion values to SIR
-ecoli3 <- ecoli2 %>% mutate_if(is.disk, as.sir, guideline = "CLSI")
-str(ecoli3)
+ecoli2 %>% mutate_if(is.disk, as.sir, guideline = "CLSI")
 
 #To keep disk diffusion columns and columns with SIR values
 ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>%
@@ -528,8 +543,8 @@ enterococci <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Enter
 #Remove columns starting with SIR, change column names and add a new column with species                    
 enterococci_select <- enterococci%>% 
   select(!starts_with("SIR")) %>%
-  setNames(c("meat_shop", "stratification", "location_name", "GPS_x", "GPS_y", 
-             "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
+  setNames(c("meat_shop", "stratification", "date_collection", "sample_type",
+             "sample_collection", "sample_weight_Kg", 
              "sample_source", "farm_category", "slaughter", "transportation", 
              "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", 
              "CHL", "AMP", "TCY", "ERY", "TGC", "QDA", "VAN", "LNZ")) %>%
@@ -541,8 +556,8 @@ enterococci_select <- enterococci%>%
 salmonella <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Salmonella")
 #Remove columns starting with SIR, change column names and add a new column with species                    
 salmonella_select <- salmonella%>% 
-  select(!starts_with("SIR"), -c(1, 20, 39:40)) %>%
-  setNames(c("meat_shop", "stratification", "location_name", "GPS_x", "GPS_y", 
+  select(!starts_with("SIR"), -c(1, 17, 36:37)) %>%
+  setNames(c("meat_shop", "stratification",  
              "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
              "sample_source", "farm_category", "slaughter", "transportation", 
              "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", "GEN",
@@ -558,12 +573,20 @@ salmonella_select$date_collection <- ymd(salmonella_select$date_collection)
 
 Bind the ecoli, enteroccoci and salmonella data frames together.
 
-```{r}
-
+```{r bindrows}
+#Where columns don't match will get NA
 df <- bind_rows(ecoli_select, salmonella_select, enterococci_select) %>%
-  select(species, 1:34)
+  select(species, 1:31) #select species first then remainder of columns
+str(df)
 ```
 
+To bind columns from together from two data frames use one of the join functions inner_join(), left_join() (keeps all observations in x), right_join() (keeps all observations in y) or a full_join() see https://dplyr.tidyverse.org/reference/mutate-joins.html for more information. Here is one example.
+
+```{r join}
+meta <- read_csv("data/metadata.csv")
+df_join <- full_join(ecoli, meta, by = "FTL code")
+str(df_join)
+```
 ***Exercise***
 
 1. Generate SIR columns for the new df.
@@ -762,6 +785,7 @@ our_data1 %>%
 
 <br>
 <br>
+
 #### MIC frequency distribution 
 
 Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/AMR.html#interpreting-mic-and-disk-diffusion-values
@@ -786,14 +810,21 @@ autoplot(mic_values)
 autoplot(mic_values, mo = "K. pneumoniae", ab = "cipro", guideline = "EUCAST 2023")
 ```
 
-The AMR R package cannot be used to generate an MIC frequency table so here dply has been used to generate this table. 
+The AMR R package cannot be used to generate an MIC frequency table so in the example below dplyr has been used to generate this table. 
 
 ```{r}
+#Generate random MIC values for E. coli
+set.seed(123)
 mic_values <- random_mic(90, mo = "Escherichia coli")
 
-antibiotic <- rep(c("Ampicillin","Gentamicin", "Tetracycline"), each = 30)
-animal <- rep(c("Cattle", "Pig", "Chicken"), times = 30)
+##Generate the example metadata
+#Generate a vector with the antimicrobial names
+antibiotic <- rep(c("Ampicillin","Gentamicin", "Tetracycline"), each = 30) #repeat each string 30 times
+#Generate a vector with the animal names
+animal <- rep(c("Cattle", "Pig", "Chicken"), times = 30) # repeat "Cattle", "Pig", "Chicken" 30 times
+#Combine the mic values and metadata into a tibble
 dat <- tibble(MIC = mic_values, Antibiotic= antibiotic, Animal = animal)
+head(dat)
 
 # Define the MIC categories
 mic_breaks <- c(0, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, Inf)
@@ -801,14 +832,24 @@ mic_labels <- c("0.25", "0.5", "1", "2", "4", "8", "16", "32", "64", "128")
 
 # Create the frequency table
 mic_table <- dat %>%
-  mutate(MIC = as.numeric(MIC)) %>%
-  mutate(MIC_category = cut(MIC, breaks = mic_breaks, labels = mic_labels, right = FALSE)) %>%
-  group_by(Antibiotic, Animal) %>%
-  count(MIC_category) %>%
-  pivot_wider(names_from = MIC_category, values_from = n, values_fill = 0)
+  mutate(MIC = as.numeric(MIC)) %>% #converts the MIC column to numeric class
+  mutate(MIC_category = cut(MIC, breaks = mic_breaks, labels = mic_labels, right = FALSE)) %>% # cut the MIC values into bins based on the predefined breakpoints and label
+  group_by(Antibiotic, Animal) %>% #group the data by antibiotic and animal
+  count(MIC_category) %>% #count the number of observations for each MIC category within each group
+  pivot_wider(names_from = MIC_category, values_from = n, values_fill = 0) #Reshape the data so that the MIC categories become the column names
+```
 
-#write.table(mic_table, file = "output/mic.txt", row.names = FALSE)
+Write the table to a text or csv file.
 
+```{r table, eval = FALSE}
+write.table(mic_table, file = "output/mic.txt", row.names = FALSE)
+write.csv(mic_table, file = "output/mic.csv", row.names = FALSE)
+```
+
+Generate some basic statistics in a table
+
+```{r}
+#summarise the data using the reframe() function
 dat %>%
   group_by(Antibiotic, Animal) %>%
   reframe(
@@ -821,58 +862,72 @@ dat %>%
 
 <br>
 <br>
+
 ### Determining multi-drug resistance
 
 Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/MDR.html
 
-The number of MDR isolates can be determined using the mdro() function. Use the example_isolates  
+The number of MDR isolates can be determined using the mdro() function. Use the example_isolates dataset to determine the number of MDR isolates. Note it is unclear based on the tutorial how it is determining whether an isolate is MDR or not. It is not based on 3 classes or more. 
 
 ```{r}
-x <- mdro(example_isolates, guideline = "EUCAST", pct_required_classes = 0.5)
-table(x)
+#Generate a table with the total number of MDR isolates
+mdr <- mdro(example_isolates, guideline = "EUCAST", pct_required_classes = 0.5)
+table(mdr)
 
 example_isolates %>%
-  mdro() %>%
-  freq()
+  mdro() %>% #Classify isolates as MDR using default settings
+  freq() #Generate a frequency table
 
+#Generate a table with the number of MDR isolates grouped by species
 example_isolates %>%
-  mutate(MDRO = x) %>%
-  group_by(mo) %>%  # Use mo_species if you want species-level
-  count(MDRO)
+  mutate(MDRO = mdr) %>% #create a new column called MDRO
+  group_by(mo) %>%  #Group by species
+  count(MDRO) %>% #Counts the number of isolates
+  filter(MDRO == "Positive") #Filters for those rows that are MDR positive
+```
 
+The group/class that each antimicrobial can be checked by filtering the antibiotics dataset from the AMR R package.
+
+```{r}
 antibiotics %>%
   select(ab, group) %>%
   filter(ab == "GEN" | ab =="CHL" | ab =="MEM" | ab =="CRO" | ab =="CIP" | ab =="FEP" | ab =="NAL" | ab =="AMP" | ab =="TCY" | ab =="SXT" | ab =="ETP" | ab =="ERY" | ab =="TGC" | ab =="QDA" | ab =="VAN" | ab =="LNZ")
+```
 
-y <- mdro(df3, guideline = "EUCAST", pct_required_classes = 0.1)
+Check how many isolates are MDR in the combined *Enterococcus*, *Salmonella*, *E. coli* dataset and filter the dataset for the isolates that are positive.
+
+```{r}
+
+mdr <- mdro(df3, guideline = "EUCAST", pct_required_classes = 0.5)
 df3 %>%
-  mutate(MDRO = y) %>%
-  group_by(species) %>%  # Use mo_species if you want species-level
+  mutate(MDRO = mdr) %>%
+  group_by(species) %>%  #l
   count(MDRO)
 
 df3_mdr <- df3 %>%
-  mutate(MDRO = y)
+  mutate(MDRO = mdr)
 
 # Filter for MDR isolates
 df3_mdr %>% filter(MDRO == "Positive")
-
-
 
 ```
 
 <br>
 <br>
+
 ### Principal Component analysis 
 
-Note 30 observations are required for each grouped variable.
+PCA analysis can be used for grouping and visualising datasets. Note when using the AMR R package for PCA analysis 30 observations are required for each grouped variable.
 
-```{r}
+Use the example_isolates dataset from the AMR package to generate a PCA plot where the SIR data for the antimicrobials AMC, CXM, CTX,
+    CAZ, GEN, TOB, TMP, SXT are used as the features and the data is grouped by order and genus.
+
+```{r pca}
 set.seed(123)
 resistance_data <- example_isolates %>%
   group_by(
     order = mo_order(mo), # group on anything, like order
-    genus = mo_genus(mo)
-  ) %>% #  and genus as we do here
+    genus = mo_genus(mo)) %>% 
   summarise_if(is.sir, resistance) %>% # then get resistance of all drugs
   select(
     order, genus, AMC, CXM, CTX,
@@ -883,8 +938,12 @@ pca_result <- pca(resistance_data)
 
 summary(pca_result)
 
-ggplot_pca(pca_result)
+ggplot_pca(pca_result) # plot the results
+```
 
+Use the surveillance data or your own data to generate a PCA plot. Try grouping on one of the sample metadata variables.
+
+```{r}
 ##Using the Surveillance data
 ##This isn't a very good example.
 
@@ -904,6 +963,7 @@ ggplot_pca(pca_result)
 
 <br>
 <br>
+
 ## Day 4 - Plotting
 
 ggplots are made up of geoms and aesthetics. The geoms are the way in which the data is plotted e.g. points, lines, bars. The aesthetics (aes) are the way in which data is mapped to things like the size shape and colour. 
@@ -916,15 +976,15 @@ geom<name>(mapping = aes(x = <x_variable>, y = <y_variable>, color = <variable_f
 
 labs(x = <x_axis_label>, y = <y_axis_label>))
 
-See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnwRfLe0w_2eaf49b2cfcf450db2f2bb95681f55f1_03_01grammarofgraphics.html?Expires=1741046400&Signature=CP49Mmw63hpCBlR5IBPO~We~0Djsy5Qox2zfzNyAISHCWkq6Amnqz6o8-1mcao8FBsA0hOvT4iKd7VARcOBVj5aamI6GMNxPgb2MDld2udjVFGQZu-4RNp0kKCEg693bmJOf6ryogLAXgKPEUT9-dVZ852EnOk-0iZU89PVvt7w_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) from the arranging and visualising coursera course. 
-
-[ggplot2 website](https://ggplot2.tidyverse.org/)
-
-The ggplot2 book by Hadley Wickham. 
+See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnwRfLe0w_2eaf49b2cfcf450db2f2bb95681f55f1_03_01grammarofgraphics.html?Expires=1741046400&Signature=CP49Mmw63hpCBlR5IBPO~We~0Djsy5Qox2zfzNyAISHCWkq6Amnqz6o8-1mcao8FBsA0hOvT4iKd7VARcOBVj5aamI6GMNxPgb2MDld2udjVFGQZu-4RNp0kKCEg693bmJOf6ryogLAXgKPEUT9-dVZ852EnOk-0iZU89PVvt7w_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) from the arranging and visualising coursera course or [ggplot2 website](https://ggplot2.tidyverse.org/) for more about ggplots.
 
 ***Some basic examples of plots***
 
+Here are some basic examples of how to construct scatterplots.The color or shape arguments can be used to change the appearance of the points. The facet_wrap function is used to wrap multiple plots together. The geom_smooth function adds in an overall trend line  as well as the 95% confidence intervals for that line, which are represented by the gray zone.
+
 ```{r ggplot}
+
+#Basic scatter plots
 ggplot(data = ecoli3) +
   geom_point(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
   labs(x = "Collection date", y = "Zone size (mm)" )
@@ -944,18 +1004,28 @@ ggplot(data = ecoli3) +
   labs(x = "Collection date", y = "Zone size (mm)" )
 ```
 
-In the above example by adding in the smooth geom it adds in an overall trend line  as well as the 95% confidence intervals for that line, which are represented by the gray zone.
+geom_line() is used to generate a line graph.
 
 ```{r}
 ggplot(data = ecoli3) +
   geom_line(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
   labs(x = "Collection date", y = "Zone size (mm)" )
+```
 
+geom_histogram() is used to generate a histogram
+
+```{r}
 ggplot(data = ecoli3) + 
   geom_histogram(mapping = aes(x = CHL_disk), 
                  binwidth = 2) +
   labs(x = "Zone size (mm)", y = "Frequency" )
+```
 
+Use geom_bar() to generate a bar plot of sample collection point versus E.coli SIR count for the antimicrobial CHL using the surveillance data.
+
+```{r bar}
+
+#filter the combined
 df4 <- df3 %>%
   filter(species == "Escherichia coli") %>%
   select(sample_collection, CHL, CHL_disk)
@@ -964,22 +1034,35 @@ df4 <- df3 %>%
 ggplot(data = df4) + 
   geom_bar(mapping = aes(x = sample_collection, fill = CHL)) +
   labs(x = "Sample collection point", y = "Isolate count" )
+```
 
+Flip the bar plot
+
+```{r}
 ggplot(data = df4) + 
   geom_bar(mapping = aes(x = sample_collection, fill = CHL)) +
   coord_flip() +
-  labs(x = "Isolate count", y = "Sample collection point")
+  labs(y = "Isolate count", x = "Sample collection point")
+```
 
+Plot the proportion instead of the count
+
+```{r}
 #Barplot with proportion
 ggplot(data = df4) + 
   geom_bar(mapping = aes(x = sample_collection, fill = CHL), position = "fill") +
   labs(x = "Sample collection point", y = "Proportion" )
+```
 
+Plot a box plot using the same metadata as above but using the disk diffusion values.
+
+```{r boxplot}
 ggplot(data = df4) + 
   geom_boxplot(mapping = aes(x = CHL_disk, y = sample_collection)) +
   labs(x = "Zone size", y = "Sample collection point" )
 ```
 
+Using just the ecoli data set use geom_bar to plot the frequency of S, I and R (each one as a separate bar) for the antimicrobial GEN. What is the difference between this code where each bar is separate and the stacked bar plot above?
 
 ```{r}
 ggplot(ecoli3, aes(x = GEN)) +
@@ -992,6 +1075,8 @@ ggplot(ecoli3, aes(x = GEN)) +
   theme_minimal()
 ```
 
+Using the same dataset as above plot a box plot using the disk diffusion values.
+
 ```{r}
 ggplot(ecoli3,
        aes(x = sample_collection, y = GEN_disk, colour = GEN)) +
@@ -999,8 +1084,7 @@ ggplot(ecoli3,
   geom_boxplot(fill = NA, colour = "grey40") +
   #scale_y_mic() +
   #scale_colour_sir() +
-  labs(title = "MIC Distribution and SIR Interpretation",
-       x = "Sample Groups",
+  labs( x = "Sample Groups",
        y = "disk diffusion zone (mm)")
 
 # add a group
@@ -1018,55 +1102,94 @@ ggplot(my_data,
 
 ```
 
+Here is the list of geoms available through ggplot2.
+
+```{r}
+ls("package:ggplot2", pattern = "^geom_")
+```
+
+There is also a range of aesthetics that can be adjusted:
+
+```{r}
+ggplot2:::.all_aesthetics
+```
+
+For example, background colours (bg), rotating the angle of the text (angle), line type (lty) and width (lwd), colour transparency (alpha) can be adjusted. 
+
 <br>
 <br>
+
+
 ### Plots for publications
 
-Use theme() function for things that relate to the entire plot e.g. background colour. 
+Below are some examples of more complex plots.  
 
-alpha changes the transparency of the colour. 
+***Line graphs**
 
-Assigning colour to a constant colour versus assinging it to a variable. If assigning it to a variable it has to wrapped within the aes function. 
+This example uses the ecoli dataset to generate a line graph to show the percentage of resistant E. coli over time. First the data is prepared.
 
 ```{r}
 
+#Select columns of interest
 ecoli_res <- ecoli3 %>%
-  filter(species == "Escherichia coli") %>%
   mutate(
-    month = floor_date(date_collection, "month")  # Convert to first day of month
+    month = floor_date(date_collection, "month")  # Add new column called month and Convert date to first day of month
   ) %>%
-  select(month, sample_source, location_name, sample_collection, AMP, TCY)
+  select(month, sample_source, sample_collection, AMP, TCY) #Select columns of interest
 
+#Reshape data
 ecoli_long <- ecoli_res %>%
-  pivot_longer(cols = AMP:TCY, names_to = "antibiotic", values_to = "resistance") %>%
-  mutate(resistance = ifelse(as.numeric(resistance) == 3, 1, 0)) %>%
-  unite(source_location, sample_source, location_name, sep = "_", remove = FALSE)
+  pivot_longer(cols = AMP:TCY, names_to = "antibiotic", values_to = "resistance") %>% #Reshape date into long format where antibiotics becomes a single column
+  mutate(resistance = ifelse(as.numeric(resistance) == 3, 1, 0)) #Modify resistance column if level 3 (for R) set to 1, otherwise 0
+  
 
+#Summarise data for each month
 res_summary <- ecoli_long %>%
-  group_by(month, antibiotic) %>%
-  summarise(percent_resistant = mean(resistance) * 100)
+  group_by(month, antibiotic) %>% #group by month and antibiotic
+  summarise(percent_resistant = mean(resistance) * 100) #Generate a mean for each month
+```
 
-ggplot(res_summary, aes(x = month, y = percent_resistant, color = antibiotic)) +
-  geom_line() +
-  geom_point() +
-  scale_x_date(date_labels = "%b-%Y", date_breaks = "1 month") +
+The data is now in format to be plotted.
+
+```{r}
+
+ggplot(res_summary, aes(x = month, y = percent_resistant, color = antibiotic)) + #use the res_summary dataframe and plot month vs percent resistant
+  geom_line() + #line graph
+  geom_point() + #include points
+  scale_x_date(date_labels = "%b-%Y",  date_breaks = "1 month") + #Use Month (%b)-Year(%Y) format for the labels and break by 1 month
   labs(
     title = "Percentage of Resistant Isolates Over Time",
-    x = "Time (Month)",
+    x = "Time (Month)", 
     y = "Percentage Resistant",
-    color = "Antibiotic") +
-    theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45))
+    color = "Antibiotic") + #labels for title, x axis, y axis, legend
+    theme_minimal() + #Use a minimal background theme which you can then build on
+  theme(axis.text.x = element_text(angle = 45)) #theme() function is used for things that relate to the entire plot e.g. background colour. Change the element text of the x axis to a 45 C angle.
+```
 
+```{r, eval = FALSE, hide = TRUE}
+#Reshape data example using unite
+ecoli_long <- ecoli_res %>%
+  pivot_longer(cols = AMP:TCY, names_to = "antibiotic", values_to = "resistance") %>% #Reshape date into long format where antibiotics becomes a single column
+  mutate(resistance = ifelse(as.numeric(resistance) == 3, 1, 0)) %>% #Modify resistance column if level 3 (for R) set to 1, otherwise 0
+  unite(source_location, sample_source, location_name, sep = "_", remove = FALSE) #Generate new column source_location by uniting the sample-source and location_name columns
+```
+This example illustrates how to generate a map using the rnaturalearth package and overlay it with prevalence data. Try removing some parts of the plot to see how it changes.
+
+```{r}
+#Load the libraries
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(rnaturalearthhires)
+
+#Reshape the data
 res_location <- ecoli_long %>%
   filter(antibiotic == "AMP") %>%
   group_by(sample_source, antibiotic) %>%
   summarise(percent_resistant = mean(resistance) * 100)
 
-#Using a detailed map with regions from the rnaturalearthhires package 
+head(res_location)
+
+#Obtain spatial data (sf object) for Bhutan using the ne_states() function
 bhutan_map <- ne_states(country = "Bhutan", returnclass = "sf")
 
 #Merging the map data with the perc_resistance data, note there must be matching columns.
@@ -1074,46 +1197,49 @@ map_data <- left_join(bhutan_map, res_location, by = c("name_sv" = "sample_sourc
 
 
 ggplot(data = map_data) +
-geom_sf(aes(fill = percent_resistant)) +  # Fill regions based on resistance
-geom_sf_text(aes(label = ifelse(is.na(percent_resistant), name_sv,
-paste0(name_sv, "\n", round(percent_resistant, 1), "%")
+geom_sf(aes(fill = percent_resistant)) +  # Plot a spatial object Fill regions based on resistance
+geom_sf_text(aes(label = ifelse(is.na(percent_resistant), name_sv, # if na label with name_sv (region) 
+paste0(name_sv, "\n", round(percent_resistant, 1), "%") #else label with name_sv and percen_resistant. \n is newline character
 )),
 color = "black", size = 3) +  # Colors region names black size 3
-scale_fill_gradient(low = "lightblue", high = "darkblue", na.value = "white",
+scale_fill_gradient(low = "lightblue", high = "darkblue", na.value = "white", #Apply a colour gradient to the map
 name = "Resistance Rate (%)") +
-theme_minimal() +
-theme(axis.text = element_blank(),
-axis.ticks = element_blank(),
-panel.grid = element_blank(),
-axis.title = element_blank()
+theme_minimal() + #Use a minimal theme then add to it
+theme(axis.text = element_blank(), #Remove axis labels
+axis.ticks = element_blank(), #Remove axis ticks
+panel.grid = element_blank(), #Remove panel grid
+axis.title = element_blank() #Remove axis labels
 )
+```
 
-res_source <- ecoli_long %>%
-  group_by(source_location, antibiotic) %>%
-  summarise(percent_resistant = mean(resistance) * 100)
+This example uses the ecoli dataset to illustrate how to generate a multi-panel boxplot for two collection points.
 
+```{r}
+
+#Reshape the data
 df_summary <- ecoli_long %>%
-group_by(antibiotic, source_location, sample_collection) %>%
-summarise(mean_resistance = mean(resistance) * 100, .groups = "drop")
+  group_by(antibiotic, sample_source, sample_collection) %>%
+  summarise(mean_resistance = mean(resistance) * 100, .groups = "drop")
 df_summary
 
+#Boxplot
 ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) +
-geom_boxplot(outlier.shape = NA, alpha = 0.5) +  # Boxplot (removing default outliers)
-geom_jitter(aes(color = antibiotic), width = 0.2, size = 2, alpha = 0.7) +  # Individual data points
-facet_wrap(~ sample_collection, scales = "free") +  # Separate by sample_collection
-scale_fill_brewer(palette = "Set3") +
-scale_color_brewer(palette = "Set3") +
-labs(title = "Antibiotic Resistance by Source Location",
-x = "Collection Point",
-y = "Mean Resistance (%)") +
+  geom_boxplot(outlier.shape = NA, alpha = 0.5) +  # Boxplot (removing default outliers)
+  geom_jitter(aes(color = antibiotic), size = 2, alpha = 0.7) +  # Plot jittered data points size 2 and transparency 0.7
+  facet_wrap(~ sample_collection) +  # Create two panels separate by sample_collection
+  scale_fill_brewer(palette = "Set3") + #specify the colour palette to be used for box plot
+  scale_color_brewer(palette = "Set3") + #Use the same palette for the points
+  labs(x = "Collection Point",
+       y = "Occurrence of Resistance (%)") + #Labels for x and y axis
 theme_minimal() +
-theme(legend.position = "top",
-axis.text.x = element_text(angle = 45, hjust = 1))
+theme(legend.position = "top", #Place the legend at the top
+axis.text.x = element_text(angle = 45))
 
+#Boxplot with a different width
 ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) + #Define the aesthetic mappings for x, y and fill
     geom_boxplot(width = 0.2) +  #Create the box plot and specify width of boxes
     geom_jitter(aes(color = antibiotic), size = 3) +  # Adds individual data points which are jittered
-    facet_wrap(~ sample_collection, scales = "free") +  # Separates plots into two facets by sample_collection
+    facet_wrap(~ sample_collection) +  # Separates plots into two facets by sample_collection
     scale_fill_brewer(palette = "Set3") +  #Colour for box plots
     scale_color_brewer(palette = "Set3") +  #Colour for points
     labs(y = "Occurrence of Resistance (%)") + #Y axis label
@@ -1125,14 +1251,17 @@ ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) 
 
 ```
 
+This example demonstrates how to generate a mirrored barplot similar to that in presented in Mughini-Gras 2019 Lancet Planet Health 2019: 
+3: 357–69. 
+
 ```{r}
+#Generate some example data
 data <- tibble(
-  Source = c("Open community", "Surface freshwater", "Wild birds", "Chicken meat", "Bovine meat",
+  Source = c("Wild birds", "Chicken meat", "Bovine meat",
              "Sheep and goat meat", "Pork", "Turkey meat", "Seafood", "Raw vegetables", "Chickens",
-             "Cattle", "Sheep and goats", "Pigs", "Dogs", "Cats", "Horses", "Clinical patients",
-             "Returning travellers", "Farmers"),
-  Prevalence = c(30, 10, 15, 50, 40, 35, 20, 15, 45, 55, 25, 10, 5, 12, 8, 6, 4, 15, 10, 20),
-  HumanExposure = c(50, 5, 8, 40, 35, 30, 18, 12, 50, 60, 22, 8, 3, 10, 6, 5, 3, 12, 8, 15)
+             "Cattle", "Sheep and goats", "Pigs", "Dogs", "Cats", "Horses"),
+  Prevalence = c(15, 50, 40, 35, 20, 15, 45, 55, 25, 10, 5, 12, 8, 6, 4),
+  HumanExposure = c(50, 5, 8, 40, 35, 30, 18, 12, 50, 60, 22, 8, 3, 10, 6)
 )
 
 # Convert prevalence to negative values for mirroring
@@ -1162,7 +1291,10 @@ ggplot(data) +
 
 <br>
 <br>
-###Upset plots
+
+### Upset plots
+
+This example illustrates how to generate an upset plot.
 
 ```{r}
 library(ComplexUpset) 
@@ -1218,6 +1350,7 @@ upset(upset,
 
 <br>
 <br>
+
 ### Visualising pairwise relationships
 
 This code was adapted by Patrick Biggs and Natalia Gonzalez from https://stackoverflow.com/questions/20872133/using-stat-binhex-with-ggpairs 
@@ -1271,6 +1404,7 @@ ggpairs_hex(c_clean)
 
 <br>
 <br>
+
 ## Day 5 - Local and Healthy Chickens Comparison
 
 1. Generate tables and plots to compare local chicken AST results with healthy chicken. 
@@ -1281,6 +1415,7 @@ ggpairs_hex(c_clean)
 
 <br>
 <br>
+
 ## Useful links to other tutorials and resources
 
 Links to the AMR R package
@@ -1292,6 +1427,6 @@ For dates and times see https://r4ds.had.co.nz/dates-and-times.html
 
 https://r-graph-gallery.com/
 
-References
+***References***
 
 Berends et al. AMR: An R Package for Working with Antimicrobial Resistance Data doi: 10.18637/jss.v104.i03
