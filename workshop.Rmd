@@ -113,8 +113,8 @@ Read in a csv file using base R
 ```{r, error= TRUE}
 campy <- read.csv("data/Campylobacter_117.csv", header = TRUE)
 ```
-Why do we get this error?
 
+Why do we get this error?
 
 Read in a modified csv file that does not contain these characters.
 
@@ -139,7 +139,21 @@ ecoli <- read_excel("data/Bh_AMR_Surveillance data.xlsx", sheet = "E.coli")
 <br>
 <br>
 
-#### Check your data
+#### Checking and tidying data
+
+Some recommendations for "tidy data" include:
+
+* Keep names simple
+
+* Use an underscore _ instead of a space or preferably one word
+
+* Use abbreviated words instead of a symbol. e.g. perc instead of %
+
+* Be consistent between tables e.g. id versus i.d versus ID
+
+* Each variable results in one column
+
+* Each observation results in one row
 
 The function str() is probably the most important function in R for checking the structure of your data. This gives you information on the number of rows and columns, the names of your columns, the class of each column.
 
@@ -161,23 +175,6 @@ table(ecoli$'Name of meat shop', useNA = "ifany")
 <br>
 <br>
 
-#### Tidying your data
-
-Some recommendations for "tidy data" include:
-
-* Keep names simple
-
-* Use an underscore _ instead of a space or preferably one word
-
-* Use abbreviated words instead of a symbol. e.g. perc instead of %
-
-* Be consistent between tables e.g. id versus i.d versus ID
-
-* Each variable results in one column
-
-* Each observation results in one row
-
-
 ***Group activity***
 
 What types of things could be tidied up in the "ecoli" dataset?
@@ -198,7 +195,12 @@ select(ecoli, 13:15)
 
 #Select by column name 
 select(ecoli, Stratification, 'Dzongkhag (sample source)', 'Sample type')
+
+#Using base R to subset - all rows, columns 13:15
+ecoli[,13:15]
 ```
+
+For more on subsetting using base R see https://adv-r.hadley.nz/subsetting.html 
 
 Use the select function to remove the SIR columns (which contain no values) and assign it the object "ecoli_select".
 
@@ -221,6 +223,10 @@ Multiple functions can also be chained together using %>%. In the example below 
 ecoli %>%
   select(`Dzongkhag (sample source)`, `Sample ID`, `Tetracyclin (30µg)`) %>%
   filter(`Tetracyclin (30µg)` < 15)
+
+ecoli %>%
+  select(`Dzongkhag (sample source)`, `Sample ID`, colnames(ecoli)[31]) %>%
+  filter(get(colnames(ecoli)[31]) < 15)
   
 ```
 
@@ -231,6 +237,13 @@ Rename the columns so that they are simple, informative, and do not contain any 
 ```{r}
 #Rename columns
 colnames(ecoli_select) <- c("meatshop", "stratification", "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_other_meat", "sampleID", "FTLcode", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
+
+#Alternatively use the set names function
+ecoli_select <- setNames(ecoli, c("meat_shop", "stratification", "date_collection", "sample_type",
+             "sample_collection", "sample_weight_Kg", "sample_source",
+             "farm_category", "slaughter", "transportation", "transport_medium",
+             "transport_with_other_meat", "sample_ID", "FTL_code", "GEN", "CHL",
+             "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT"))
 ```
 
 In the above example the antibiotic names have been changed to their abbreviated form. Check the abbreviation that is used by the AMR package for streptomycin
@@ -254,11 +267,19 @@ ecoli %>% rename(meatshop = `Name of meat shop`,
 
 ***Formatting the date***
 
-Some of the dates look like they may be in an excel serial date format. There are methods in R that you can use to format the dates into the same format. 
+Some of the dates look like they may be in an excel serial date format. There are methods in R that you can use to format the dates into the same format.These will not be discussed here.
 
 ```{r date}
 ecoli_select$date_collection
 ```
+
+The lubridate package can be used for parsing dates into a date format. For example to convert a date into a month-day-year format. See https://lubridate.tidyverse.org/. 
+
+```{r}
+mdy("4/1/17")
+```
+
+This same function can be applied to a column in a dataframe.
 
 ```{r, eval = FALSE, results='hide', echo=FALSE}
 ec_test <- ecoli_select %>%
@@ -269,13 +290,21 @@ ec_test <- ecoli_select %>%
          )) %>%
   mutate(date_collection = ymd(date_collection))  # Ensure final format is YYYY-MM-DD
 
-
-
 ```
 
-Re-read version 2 of the excel file, which has the correct format and then change the date column to date format. 
+***Exercise***
 
-```{r}
+1. Re-read version 2 of the excel file, which has the correct date format and assign it to ecoli.
+
+2. Chain together the following operations and assign it to ecoli_select.
+
+* select all columns except those starting with "SIR"
+* change the column names
+* add a new column called species with "Escherichia coli" as the column value
+
+3. Change the date column to date format (using the lubridate library). Use ?lubridate to check what function should be used for parsing a date in the year-month-day format.
+
+```{r, results='hide', echo = FALSE}
 ecoli <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "E.coli")
 #Remove columns starting with SIR, change column names and add a new column with species                    
 ecoli_select <- ecoli %>% 
@@ -293,7 +322,7 @@ str(ecoli_select)
 ecoli_select$date_collection <- ymd(ecoli_select$date_collection)
 ```
 
-Often dates will come through as class "character". In the example above they are in the POSIXIt data type which is also a date/time data type. However, by using the lubridate function ymd() it is converted to the date data type, which means the package lubridate can then then be used for date analyses. 
+Often dates will come through as class "character". In the example above they are in the POSIXIt data type which is also a date/time data type. However, by using the lubridate function ymd() it is converted to the date data type, which means the lubridate package  can then then be used for date analyses. 
 
 ***Manipulating categorical values***
 
@@ -368,13 +397,13 @@ unique(ecoli_select$farm_category)
 
 #### Missing values
 
-Check whether there are any missing values. These are labelled as NA (meaning not available) in R.
+Check whether there are any missing values. These are labelled as NA (meaning not available) in R.There are multiple ways to check for missing values
 
 ```{r na}
-#Display rows that aren't complete cases
+#Display rows that aren't complete cases using base R to subset
 ecoli_select[!complete.cases(ecoli_select),]
 
-#Display rows that aren't complete cases
+#Display rows that aren't complete cases using base R to subset
 campy[!complete.cases(campy),]
 
 # Displays entire df where TRUE == NA, FALSE there is no NA
@@ -383,40 +412,36 @@ is.na(campy)
 #Show rows where sample ID == NA
 campy[is.na(campy$'Sample ID'), ]
 
-
-
 #If false no values are na
 any(is.na(campy$'Sample ID'))
 #Will check to see all values meet this conditon
 all(ecoli_select$TCY >= 6)
-
 
 ```
 
 To remove all rows with missing values use the complete.cases function.
 
 ```{r}
+#Check the dimensions before filtering
 dim(campy)
 
+#filter for complete cases
 campy <- campy %>%
    filter(complete.cases(.))
 
+#Check the dimensions after filtering
 dim(campy)
-
 ```
 
 To only remove rows where there are missing values in a specific column use the drop_na function
 
 ```{r}
-
 drop_na(campy, 'Sample ID')
-
 ```
 
 Alternatively missing values can be removed when when applying a function. For example when calculating the mean.
 
 ```{r}
-
 mean(ecoli_select$TCY, na.rm = TRUE)
 ```
 
@@ -487,7 +512,7 @@ dat <- data.frame(
 str(dat)
 
 #To define breakpoints
-dat <- dat %>%
+dat2 <- dat %>%
   mutate(across(CTX:STR, as.disk))%>% # convert values to data class "disk"
   mutate(STR = case_when(
     STR >= 15 ~ "S",  # Replace with your own breakpoints
@@ -496,7 +521,7 @@ dat <- dat %>%
   )) %>%
   mutate_if(is.disk, as.sir, guideline = "CLSI")  #Convert disk columns to SIR class 
 
-str(dat)
+str(dat2)
 ```
 
 To specify that you want to use the veterinary breakpoints (rather than human).
@@ -535,7 +560,9 @@ autoplot(ant)
 * Change column names 
 * Add a column called species with the appropriate species name (e.g. Enterococcus sp. Salmonella sp.)
 * Check the data for multiple types of categorical values, missing values, outliers etc...
-* Change the date format
+
+Hint use the as.ab() function to find the abbreviations for tigecycline, vancomycin, quinupristin-dalfopristin , linzolid and ertapenem
+
 
 
 ```{r, results='hide', echo = FALSE}
@@ -1173,12 +1200,20 @@ ecoli_long <- ecoli_res %>%
   mutate(resistance = ifelse(as.numeric(resistance) == 3, 1, 0)) %>% #Modify resistance column if level 3 (for R) set to 1, otherwise 0
   unite(source_location, sample_source, location_name, sep = "_", remove = FALSE) #Generate new column source_location by uniting the sample-source and location_name columns
 ```
+
 This example illustrates how to generate a map using the rnaturalearth package and overlay it with prevalence data. Try removing some parts of the plot to see how it changes.
+
+```{r, eval = FALSE}
+#Install the packages
+install.packages("devtools") # I guess you also need this
+devtools::install_github("ropensci/rnaturalearthhires")
+install.packages("rnaturalearth")
+
+```
 
 ```{r}
 #Load the libraries
 library(rnaturalearth)
-library(rnaturalearthdata)
 library(rnaturalearthhires)
 
 #Reshape the data
@@ -1302,11 +1337,11 @@ library(ComplexUpset)
 upset <- read_csv("data/upset.csv")
 
 #Generate a character vector with the antibiotic abbreviations
-antibiotics <- c("CTX","T", "CIP", "S")
+abs <- c("CTX","T", "CIP", "S")
 
 #Assign names to the elements of the antibiotics vector
-names(antibiotics) <- antibiotics
-antibiotics
+names(abs) <- abs
+abs
 
 str(upset)
 #Convert the Region2 column to a factor
@@ -1320,7 +1355,7 @@ myPalette <- palette(c( "#1F77B4", "#2CA02C", "#9467BD", "#E377C2", "#7F7F7F"))
 
 upset(upset,
   
-  antibiotics,
+  abs,
   
   
   base_annotations=list(
@@ -1426,6 +1461,9 @@ See https://bookdown.org/amy_yarnell/T32-book/selected-glossary-of-r-terminology
 For dates and times see https://r4ds.had.co.nz/dates-and-times.html 
 
 https://r-graph-gallery.com/
+
+Advanced R by Hadley Wickham https://adv-r.hadley.nz/index.html 
+R for Data Science by Hadley Wickham https://r4ds.hadley.nz/ 
 
 ***References***
 
