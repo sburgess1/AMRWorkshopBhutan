@@ -489,7 +489,7 @@ str(ecoli2)
 ecoli2 %>% mutate_if(is.disk, as.sir, guideline = "CLSI")
 
 #To keep disk diffusion columns and columns with SIR values
-ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>%
+ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>% #across the GEN:SXT columns copy values to new columns (~ defines an anonymous function, .x is placeholder for the column values )
   mutate(across(GEN:SXT, ~ as.sir(.x, guideline = "CLSI")))
 
 
@@ -512,14 +512,16 @@ dat <- data.frame(
 str(dat)
 
 #To define breakpoints
+
 dat2 <- dat %>%
-  mutate(across(CTX:STR, as.disk))%>% # convert values to data class "disk"
-  mutate(STR = case_when(
-    STR >= 15 ~ "S",  # Replace with your own breakpoints
-    STR < 12 ~ "R",
-    TRUE ~ "I"       # Intermediate
+  mutate(across(CTX:STR, as.disk)) %>%  # Convert values to "disk"
+  mutate(STR = case_when( #modify the STR column using the following conditions
+    STR >= 15 ~ "S",
+    STR < 12  ~ "R",
+    TRUE      ~ "I"
   )) %>%
-  mutate_if(is.disk, as.sir, guideline = "CLSI")  #Convert disk columns to SIR class 
+  mutate(STR = factor(STR, levels = c("S", "I", "R"), ordered = TRUE)) %>%  # Convert STR to ordered factor
+  mutate_if(is.disk, as.sir, guideline = "CLSI")  # Apply CLSI breakpoints
 
 str(dat2)
 ```
@@ -894,11 +896,12 @@ dat %>%
 
 Material for the following tutorial was taken from https://msberends.github.io/AMR/articles/MDR.html
 
-The number of MDR isolates can be determined using the mdro() function. Use the example_isolates dataset to determine the number of MDR isolates. Note it is unclear based on the tutorial how it is determining whether an isolate is MDR or not. It is not based on 3 classes or more. 
+The number of MDR isolates can be determined using the mdro() function. Use the example_isolates dataset to determine the number of MDR isolates. The default guideline CMI2012 based on the paper https://onlinelibrary.wiley.com/doi/full/10.1111/j.1469-0691.2011.03570.x. Use ?
 
 ```{r}
 #Generate a table with the total number of MDR isolates
-mdr <- mdro(example_isolates, guideline = "EUCAST", pct_required_classes = 0.5)
+
+mdr <- mdro(example_isolates, guideline = "CMI2012")
 table(mdr)
 
 example_isolates %>%
