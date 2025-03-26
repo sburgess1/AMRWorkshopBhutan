@@ -182,7 +182,7 @@ Select the columns of interest using The select() function from the dplyr packag
 
 ```{r}
 #Select by column number
-select(ecoli, 13:15)
+select(ecoli, 11:13)
 
 #Select by column name 
 select(ecoli, Stratification, 'Dzongkhag (sample source)', 'Sample type')
@@ -193,7 +193,7 @@ Select the columns of interest using base R.
 ```{r}
 
 #Using base R to subset - all rows, columns 13:15
-ecoli[,13:15]
+ecoli[,11:13]
 ```
 
 For more on subsetting using base R see https://adv-r.hadley.nz/subsetting.html 
@@ -217,13 +217,13 @@ Multiple functions can also be chained together using %>%. In the example below 
 ```{r}
 
 ecoli %>%
-  select(`Dzongkhag (sample source)`, `Sample ID`, `Tetracyclin (30µg)`) %>%
+  select(`Dzongkhag (sample source)`, `Tetracyclin (30µg)`) %>%
   filter(`Tetracyclin (30µg)` < 15)
 
 #select and filter using column index
 ecoli %>%
-  select(`Dzongkhag (sample source)`, `Sample ID`, 31) %>%
-  filter(.[[3]] < 15)
+  select(`Dzongkhag (sample source)`, 29) %>%
+  filter(.[[2]] < 15)
   
 ```
 $\\$
@@ -234,13 +234,13 @@ Rename the columns so that they are simple, informative, and do not contain any 
 
 ```{r}
 #Rename columns
-colnames(ecoli_select) <- c("meatshop", "stratification", "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_other_meat", "sampleID", "FTLcode", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
+colnames(ecoli_select) <- c("meatshop", "stratification", "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", "sample_source", "farm_category", "slaughter", "transportation", "transport_medium", "transport_other_meat", "GEN", "CHL", "MEM", "CRO", "CIP",  "FEP", "NAL", "AMP", "TCY", "SXT")
 
 #Alternatively use the set names function
-ecoli_select <- setNames(ecoli, c("meat_shop", "stratification", "date_collection", "sample_type",
+setNames(ecoli, c("meat_shop", "stratification", "date_collection", "sample_type",
              "sample_collection", "sample_weight_Kg", "sample_source",
              "farm_category", "slaughter", "transportation", "transport_medium",
-             "transport_with_other_meat", "sample_ID", "FTL_code", "GEN", "CHL",
+             "transport_with_other_meat", "GEN", "CHL",
              "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT"))
 ```
 
@@ -291,7 +291,7 @@ The mutate() function can be used for creating new columns, deleting columns and
 
 ```{r}
 #Adding a new column called species
-ec_test <- ecoli %>% mutate(species = "Escherichia coli")
+ec_test <- ecoli_select %>% mutate(species = "Escherichia coli")
 str(ec_test)
 
 #Adding a new column using the tidyverse dataset starwars
@@ -312,15 +312,17 @@ $\\$
 
 ***Exercise***
 
-1. Read in the E.coli sheet of the version 2 excel file, which has the correct date format and assign it to ecoli.
+Open an R script and save it as workshop.R. Write an R script to read in and tidy the E. coli sheet from the version 2 excel file. It should contain the following:
 
-2. Chain together the following operations and assign it to ecoli_select.
+1. Reads in the E.coli sheet and assigns it to ecoli.
+
+2. Chains together the following operations and assigns it to ecoli_select.
 
 * select all columns except those starting with "SIR"
 * change the column names
 * add a new column called species with "Escherichia coli" as the column value
 
-3. Change the date column to date format (using the lubridate library). Use ?lubridate to check what function should be used for parsing a date in the year-month-day format.
+3. Changes the date column to date format (using the lubridate library). Use ?lubridate to check what function should be used for parsing a date in the year-month-day format.
 
 ```{r, results='hide', echo = FALSE, message=FALSE}
 ecoli <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "E.coli")
@@ -330,7 +332,7 @@ ecoli_select <- ecoli %>%
   setNames(c("meat_shop", "stratification", "date_collection", "sample_type",
              "sample_collection", "sample_weight_Kg", "sample_source",
              "farm_category", "slaughter", "transportation", "transport_medium",
-             "transport_with_other_meat", "sample_ID", "FTL_code", "GEN", "CHL",
+             "transport_with_other_meat", "GEN", "CHL",
              "MEM", "CRO", "CIP", "FEP", "NAL", "AMP", "TCY", "SXT"))  %>%
   mutate(species = "Escherichia coli") # add in a column called species
 
@@ -378,7 +380,7 @@ Use gsub to remove "."
 gsub("\\.", "", ecoli_select$meat_shop)
 ```
 
-Use str_replace to remove the "." and replace "Bebak MS with BK MS" and assign to the object ecoli_select.
+Use str_replace to remove the "." and replace "Bebak MS with BK MS" and assign to the object ecoli_select (add this to your workshop.R script).
 
 ```{r str_replace}
 
@@ -394,7 +396,7 @@ $\\$
 
 ***Exercise***
 
-Check whether any of the other categorical values need to be changed and change where appropriate. 
+Check whether any of the other categorical values need to be changed and change where appropriate.Add these to your R script. 
 
 The farm_category column uses both a capital "C" and a lowercase "c" has been used for the word commercial. 
 
@@ -445,9 +447,6 @@ all(ecoli_select$TCY >= 6)
 
 # Displays entire df where TRUE == NA, FALSE there is no NA
 head(is.na(campy))
-
-
-
 ```
 
 $\\$
@@ -494,17 +493,13 @@ hist(ecoli_select$GEN, breaks = 20)
 hist(ecoli_select$GEN)
 abline(v = 14)
 hist(ecoli_select$CHL)
-hist(ecoli_select$MEM)
-hist(ecoli_select$CRO)
 hist(ecoli_select$CIP)
-hist(ecoli_select$FEP)
-hist(ecoli_select$NAL)
 hist(ecoli_select$AMP)
-hist(ecoli_select$TCY)
-hist(ecoli_select$SXT)
 ```
 
 ***Exercise***
+
+Add code for the following to your R script.
 
 * Read in the Enterococci and Salmonella excel sheets and assign them to "enterococci" and "salmonella".
 * Remove the SIR columns
@@ -521,7 +516,7 @@ enterococci_select <- enterococci%>%
   setNames(c("meat_shop", "stratification", "date_collection", "sample_type",
              "sample_collection", "sample_weight_Kg", 
              "sample_source", "farm_category", "slaughter", "transportation", 
-             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", 
+             "transport_medium", "transport_with_other_meat", 
              "CHL", "AMP", "TCY", "ERY", "TGC", "QDA", "VAN", "LNZ")) %>%
   mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
          meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"),
@@ -531,11 +526,11 @@ enterococci_select <- enterococci%>%
 salmonella <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Salmonella")
 #Remove columns starting with SIR, change column names and add a new column with species                    
 salmonella_select <- salmonella%>% 
-  select(!starts_with("SIR"), -c(1, 17, 36:37)) %>%
+  select(!starts_with("SIR"), -c(1, 15, 34:35)) %>%
   setNames(c("meat_shop", "stratification",  
              "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
              "sample_source", "farm_category", "slaughter", "transportation", 
-             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", "GEN",
+             "transport_medium", "transport_with_other_meat", "GEN",
              "CHL", "MEM", "CRO", "CIP", "NAL", "AMP", "TCY", "SXT", "ETP")) %>%
   mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
          meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"),
@@ -551,15 +546,15 @@ Bind the ecoli, enteroccoci and salmonella data frames together.
 ```{r bindrows}
 #Where columns don't match will get NA
 df <- bind_rows(ecoli_select, salmonella_select, enterococci_select) %>%
-  select(species, 1:31) #select species first then remainder of columns
+  select(species, 1:29) #select species first then remainder of columns
 str(df)
 ```
 
 To bind columns from together from two data frames use one of the join functions inner_join(), left_join() (keeps all observations in x), right_join() (keeps all observations in y) or a full_join() see https://dplyr.tidyverse.org/reference/mutate-joins.html for more information. Here is one example.
 
-```{r join}
+```{r join, eval = FALSE}
 meta <- read_csv("data/metadata.csv")
-df_join <- full_join(ecoli, meta, by = "FTL code")
+df_join <- full_join(ecoli, meta, by = "Stratification")
 str(df_join)
 ```
 
@@ -589,6 +584,8 @@ ecoli3 <- ecoli2 %>% mutate(across(GEN:SXT, ~ .x, .names = "{.col}_disk")) %>% #
   mutate(across(GEN:SXT, ~ as.sir(.x, guideline = "CLSI")))
 str(ecoli3)
 ```
+
+Add the above code to your R script.
 
 To define your own breakpoints:
 
@@ -650,7 +647,7 @@ $\\$
 
 ***Exercise***
 
-1. Generate SIR columns for the new df.
+1. Generate SIR columns for the new df. First change the disk diffusion values to a disk data class and assign this to df2. Next, copy the disk diffusion values to new columns and covert the original disk diffusion columns to SIR and assign this to df3. Copy this code into your workshop.R script.
 
 2. Generate the following antibiograms:
 
@@ -777,6 +774,8 @@ knitr::kable(df_summary)
 \pagebreak
 
 ## Day 3 - Using the AMR R Package
+
+If the merged ecoli, enterococci and salmonella data set is not still in your environment. Reload the data sets, tidy them and join them together by rerunning the script generated from day 1 (to generate the data frame assigned to df3).
 
 **First isolates**
 
@@ -1026,6 +1025,8 @@ $\\$
 
 ## Day 4 - Plotting
 
+If the merged ecoli, enterococci and salmonella data set is not still in your environment. Reload the data sets, tidy them and join them together by rerunning the script generated from day 1 (to generate the data frame assigned to df3).
+
 ggplots are made up of geoms and aesthetics. The geoms are the way in which the data is plotted e.g. points, lines, bars. The aesthetics (aes) are the way in which data is mapped to things like the size shape and colour. 
 
 The main structure for generating a ggplot is:
@@ -1223,7 +1224,9 @@ ggplot(res_summary, aes(x = month, y = percent_resistant, color = antibiotic)) +
   theme(axis.text.x = element_text(angle = 45)) #theme() function is used for things that relate to the entire plot e.g. background colour. Change the element text of the x axis to a 45 C angle.
 ```
 
-This example illustrates how to generate a map using the rnaturalearth package and overlay it with prevalence data. Try removing some parts of the plot to see how it changes.
+***Maps***
+
+The example below illustrates how to generate a map using the rnaturalearth package and overlay it with prevalence data. 
 
 First reshape the data
 
@@ -1283,7 +1286,11 @@ ggplot(data = map_data) +
         axis.title = element_blank())  # Remove axis labels
 ```
 
-This example uses the ecoli dataset to illustrate how to generate a multi-panel boxplot for two collection points.
+Try removing some parts of the code above to see how the plot changes.
+
+***Multi-panel box-plot***
+
+The example below uses the ecoli dataset to illustrate how to generate a multi-panel boxplot for two collection points.
 
 ```{r}
 
@@ -1320,7 +1327,9 @@ ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) 
           axis.title.x = element_blank())  # Remove x-axis label
 ```
 
-This example demonstrates how to generate a mirrored barplot similar to that in presented in Mughini-Gras 2019 Lancet Planet Health 2019: 
+***Mirrored barplot***
+
+The example below demonstrates how to generate a mirrored barplot similar to that in presented in Mughini-Gras 2019 Lancet Planet Health 2019: 
 3: 357–69. 
 
 ```{r}
@@ -1357,11 +1366,9 @@ ggplot(data) +
   theme_minimal()
 ```
 
-$\\$
+***Upset plots***
 
-**Upset plots**
-
-This example illustrates how to generate an upset plot.  Upset plots are used to visualise intersections of data sets (e.g. as an alternative to Venn diagrams). For further information on upset plots see https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html. 
+The example below illustrates how to generate an upset plot.  Upset plots are used to visualise intersections of data sets (e.g. as an alternative to Venn diagrams). For further information on upset plots see https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html. 
 
 ```{r}
 library(ComplexUpset) 
@@ -1395,11 +1402,9 @@ upset(dat,abs, #create an upset plot with the dataframe dat and the intersection
   ) & scale_fill_manual(values = myPalette) 
 ```
 
-$\\$
+***Visualising pairwise relationships***
 
-**Visualising pairwise relationships**
-
-This code was adapted by Patrick Biggs and Natalia Gonzalez from https://stackoverflow.com/questions/20872133/using-stat-binhex-with-ggpairs 
+The code below was adapted by Patrick Biggs and Natalia Gonzalez from https://stackoverflow.com/questions/20872133/using-stat-binhex-with-ggpairs 
 
 It generates a multi-panel grid plot with a density plot (showing the data distribution) on the diagonal, correlation values in the upper right triangle and hexbin density plots in the lower left triangle.
 

@@ -1,118 +1,118 @@
-Dzongkhang,Sample ID,LAB CODE,Organism Isolated ,Gentamicin (10ug),"Sensitive, Intermediate, Resistant (SIR)",Tetracyclin (30ug),SIR,Ampicillin (10ug),SIR,Nalidixic acid (30ug),SIR,Ciprofloxacin (5ug),SIR,Erythromycin (15ug),SIR,Streptomycin,SIR
-Thimphu,Thi/Gen/kar/chi-lay/2021-01,THI1,Campylobacter,28,S,33,S,24,S,6,R,6,R,30,S,26,S
-Thimphu,Thi/Gen/kar/Chi-Br/2021-02,THI2,Camphylobacter,24,S,34,S,23,S,6,R,6,R,27,S,27,S
-Thimphu,Thi/Gen/kar/chi-lay/21-04,THI4,Campylobacter,26,S,36,S,6,R,6,R,6,R,6,R,25,S
-Thimphu,Thi/Mew/lha/chi-lay/2021-06,THI6,Campylobacter,28,S,16,R,18,S,13,R,6,R,30,S,20,S
-Thimphu,Thi/Gen/Kar/chi-Bro/21-17,THI17,Camphylobacter,26,S,38,S,23,S,6,R,6,R,30,S,28,S
-Tsirang,Tsi/Gos/Zom/21/Chi-lay/01,TSI1,Camphylobacter,11,R,6,R,20,S,6,R,17,R,29,S,6,R
-Tsirang,,TSI8,Camphylobacter,20,S,24,I,22,S,6,R,6,R,28,S,26,S
-Tsirang,Tsi/Gos/Pel/21/Chi-lay/09,TSI9,Camphylobacter spp,30,S,32,S,32,S,6,R,6,R,36,S,30,S
-Tsirang,Tsi/Gos/Pel/21/Chi-lay/11,TSI11,Camphylobacter,22,S,22,R,18,S,6,R,6,R,20,S,24,S
-Tsirang,Tsi/Gos/Pel/21/Chi-Bro/12,TSI12,Camphylobacter spp,26,S,26,S,32,S,6,R,6,R,30,S,26,S
-Tsirang,Tsi/Phu/Bur/21/Chi-Lay/17,TSI17,Camphylobacter,20,S,34,S,24,S,6,R,6,R,30,S,24,S
-Tsirang,Tsi/Phu/Bur/21/Chi-Lay/18,TSI18,Camphylobacter spp,26,S,28,S,32,S,6,R,6,R,36,S,26,S
-Tsirang,Tsi/Phu/Bur/21/Chi-Lay/20,TSI20,Camphylobacter,22,S,26,S,19,S,6,R,6,R,20,S,23,S
-Tsirang,Tsi/Dul/Lha/21/Chi-Lay/22,TSI22,Camphylobacter,26,S,26,S,36,S,6,R,6,R,36,S,26,S
-Tsirang,,TSI24,Camphylobacter,20,S,26,S,18,S,6,R,6,R,20,S,22,S
-Tsirang,Tsi/Dul/Lha/21/Chi-Bro/25,TSI25,Camphylobacter spp,28,S,32,S,33,S,6,R,6,R,26,S,28,S
-Tsirang,Tsi/Dul/Lha/21/Chi-Lay/29,TSI29,Camphylobacter spp,28,S,30,S,28,S,6,R,6,R,30,S,27,S
-Tsirang,Tsi/Dul/Lha/21/Chi-Lay/31,TSI31,Camphylobacter spp,27,S,31,S,22,S,6,R,6,R,28,S,26,S
-Tsirang,Tsi/Dul/Lha/21/Chi-Bro/33,TSI33,Camphylobacter spp,28,S,32,S,18,S,6,R,6,R,32,S,30,S
-Tsirang,Tsi/Ser/Ser/21/Chi-Lay/35,TSI35,Camphylobacterspp,26,S,28,S,33,S,6,R,6,R,29,S,27,S
-Tsirang,Tsi/Ser/Ser/21/Chi-Lay/37,TSI37,camphylobacter spp,30,S,30,S,25,S,6,R,6,R,23,S,30,S
-Tsirang,Tsi/Ser/Ser/21/Chi-Bro/40,TSI40,Camphylobacter spp,29,S,28,S,35,S,6,R,6,R,33,S,30,S
-Tsirang,Tsi/Men/Sgn/21/Chi-lay/42,TSI42,Camphylobacter,21,S,23,I,20,S,6,R,6,R,23,S,23,S
-Tsirang,Tsi/Men/Tas/21/Chi-Lay/43,TSI43,Camphylobacter,22,S,26,S,22,S,6,R,6,R,26,S,24,S
-Tsirang,Tsi/Men/kam/21/Chi-lay/44,TSI44,Camphylobacter,24,S,32,S,22,S,6,R,6,R,28,S,30,S
-Tsirang,Tsi/Men/Res/21/Chi-Lay/45,TSI45,Camphylobacter,26,S,30,S,28,S,6,R,6,R,28,S,28,S
-Tsirang,Tsi/Pat/Cgu/21/Chi-Lay/47,TSI47,Camphylobacter,21,S,26,S,23,S,6,R,6,R,26,S,28,S
-Tsirang,Tsi/Kik/Dek/21/Chi-Bro/51,TSI51,Camphylobacter spp,21,S,24,I,18,S,6,R,6,R,21,S,22,S
-Tsirang,Tsi/Kik/Dek/21/Chi-Lay/52,TSI52,Camphylobacter,20,S,23,I,18,S,6,R,6,R,22,S,24,S
-Tsirang,Tsi/KiK/Dek/21/Chi-Bro/53,TSI53,Camphylobacter,22,S,20,R,20,S,6,R,6,R,25,S,22,S
-Tsirang,Tsi/Kik/Dek/21/Chi-Bro/56,TSI56,Camphylobacter,22,S,24,I,20,S,6,R,6,R,26,S,24,S
-Tsirang,Tsi/Gos/Zom/21/Chi-Lay/57,TSI57,Camphylobacter,25,S,30,S,23,S,6,R,6,R,24,S,24,S
-Tsirang,Tsi/Gos/Zom/21/Chi-Lay/58,TSI58,Camphylobacter,20,S,28,S,18,S,6,R,6,R,22,S,27,S
-Tsirang,Tsi/Tshok/TsoM/21/Chi-Lay/62,TSI62,Camphylobacter,36,S,46,S,32,S,6,R,6,R,44,S,34,S
-Tsirang,Tsi/Tshok/TsoM/21/Chi-Bro/63,TSI63,Camphylobacter,30,S,32,S,30,S,6,R,6,R,38,S,28,S
-Tsirang,Tsi/Tshok/TsoM/21/Chi-Bro/64,TSI64,Camphylobacter ,30,S,32,S,30,S,6,R,6,R,38,S,28,S
-Chukha,Chu 1,CHU1,Campylobacter,22,S,40,S,20,S,6,R,6,R,35,S,22,S
-Chukha,Chu 2,CHU2,Campylobacter,23,S,26,S,24,S,6,R,6,R,31,S,22,S
-Chukha,Chu 3,CHU3,Campylobacter,25,S,40,S,28,S,6,R,6,R,35,S,24,S
-Chukha,Chu 5,CHU5,Campylobacter,26,S,27,S,21,S,6,R,6,R,26,S,26,S
-Chukha,Chu 6,CHU6,Campylobacter,30,S,40,S,22,S,6,R,6,R,34,S,26,S
-Chukha,Chu 7,CHU7,Campylobacter,32,S,33,S,23,S,6,R,6,R,27,S,31,S
-Chukha,Chu 8,CHU8,Campylobacter,26,S,40,S,20,S,6,R,6,R,32,S,24,S
-Chukha,Chu 9,CHU9,Campylobacter,26,S,45,S,20,S,6,R,6,R,38,S,26,S
-Chukha,Chu 10,CHU10,Campylobacter,26,S,40,S,26,S,6,R,6,R,36,S,26,S
-Chukha,Chu 11,CHU11,Campylobacter,23,S,26,S,25,S,6,R,6,R,32,S,23,S
-Chukha,Chu 13,CHU13,Campylobacter,26,S,32,S,22,S,6,R,6,R,32,S,26,S
-Chukha,Chu 14,CHU14,Campylobacter,26,S,36,S,26,S,6,R,6,R,40,S,26,S
-Chukha,Chu 15,CHU15,Campylobacter,26,S,40,S,26,S,6,R,6,R,32,S,26,S
-Chukha,Chu 16,CHU16,Campylobacter,20,S,32,S,22,S,6,R,6,R,26,S,20,S
-Chukha,Chu 18,CHU18,Campylobacter,26,S,38,S,14,I,6,R,6,R,32,S,26,S
-Chukha,Chu 20,CHU20,Campylobacter,28,S,38,S,14,I,6,R,6,R,36,S,26,S
-Chukha,Chu 23,CHU23,Campylobacter,28,S,6,R,14,I,6,R,6,R,36,S,26,S
-Chukha,Chu 25,CHU25,Campylobacter,26,S,6,R,14,I,6,R,6,R,32,S,26,S
-Chukha,Chu 26,CHU26,Campylobacter,24,S,34,S,22,S,6,R,6,R,23,S,25,S
-Chukha,Chu 27,CHU27,Campylobacter,26,S,36,S,18,S,6,R,6,R,34,S,26,S
-Chukha,Chu 32,CHU32,Campylobacter,31,S,34,S,34,S,6,R,6,R,32,S,28,S
-Sarpang,SP 5,SAR5,Campylobacter,30,S,44,S,30,S,6,R,6,R,36,S,28,S
-Sarpang,SP 10,SAR10,Campylobacter,32,S,36,S,30,S,6,R,6,R,30,S,30,S
-Sarpang,SP 21,SAR21,Campylobacter,26,S,25,I,32,S,6,R,6,R,30,S,26,S
-Sarpang,SP 27,SAR27,Campylobacter,31,S,30,S,25,S,6,R,6,R,26,S,27,S
-Sarpang,SP 29,SAR29,Campylobacter,30,S,32,S,30,S,6,R,6,R,34,S,28,S
-Sarpang,SP 31,SAR31,Campylobacter,28,S,28,S,30,S,6,R,6,R,32,S,27,S
-Sarpang,SP 37,SAR37,Campylobacter,30,S,40,S,26,S,6,R,6,R,32,S,34,S
-Sarpang,SP 38,SAR38,Campylobacter,28,S,42,S,32,S,6,R,6,R,40,S,32,S
-Sarpang,SP 45,SAR45,Campylobacter,31,S,30,S,29,S,6,R,6,R,32,S,27,S
-Sarpang,SP 48,SAR48,Campylobacter,28,S,31,S,27,S,6,R,6,R,28,S,30,S
-Sarpang,Sp 62,SAR62,Campylobacter,28,S,33,S,24,S,6,R,6,R,36,S,32,S
-Sarpang,SP 63,SAR63,Campylobacter,30,S,32,S,30,S,6,R,6,R,38,S,28,S
-Samtse,Sam 05,SAM 5,Campylobacter,23,S,21,R,19,S,20,S,22,I,21,S,20,S
-Samtse,Sam 12,SAM 12,Campylobacter,18,S,10,R,25,S,10,R,6,R,23,S,6,R
-Samtse,Sam 31,SAM 31,Campylobacter,29,S,46,S,36,S,6,R,6,R,44,S,28,S
-Samtse,Sam 34,SAM 34,Campylobacter,26,S,42,S,26,S,6,R,6,R,36,S,26,S
-Samtse,Sam 39,SAM 39,Campylobacter,26,S,42,S,17,S,6,R,6,R,36,S,26,S
-Samtse,Sam 40,SAM 40,Campylobacter,30,S,44,S,32,S,6,R,6,R,42,S,28,S
-Samtse,Sam 41,SAM 41,Campylobacter,34,S,40,S,28,S,6,R,6,R,42,S,30,S
-Samtse,sam 43,SAM 43,Campylobacter,30,S,44,S,30,S,6,R,6,R,30,S,28,S
-Samtse,Sam 46,SAM 46,Campylobacter,30,S,48,S,34,S,6,R,6,R,36,S,28,S
-Samtse,Sam 47,SAM 47,Campylobacter,26,S,44,S,23,S,6,R,6,R,32,S,24,S
-Samtse,sam 49,SAM 49,Campylobacter,32,S,40,S,26,S,6,R,6,R,42,S,30,S
-Samtse,Sam 61,SAM 61,Campylobacter,28,S,46,S,32,S,6,R,6,R,40,S,27,S
-Samtse,Sam 65,SAM 65,Campylobacter,34,S,40,S,28,S,6,R,6,R,42,S,34,S
-Samtse,Sam 71,SAM 71,Campylobacter,25,S,46,S,32,S,6,R,6,R,36,S,21,S
-Samtse,Sam 72,SAM 72,Campylobacter,25,S,42,S,16,I,6,R,6,R,32,S,21,S
-Samtse,Sam 73,SAM 73,Campylobacter,28,S,16,R,28,S,6,R,6,R,30,S,28,S
-Tashigang,Tas/udz/14,TAS14,Campylobacter,26,S,26,S,28,S,6,R,6,R,30,S,24,S
-Chukha,Chu/Dra/2022/Chi-LA-62,CHU62,Camphylobacter jejuni,27,S,30,S,24,S,6,R,6,R,30,S,24,S
-Chukha,Chu/Dra/2022/Chi-LA-61,CHU61,Camphylobacter jejuni,8,R,6,R,19,S,6,R,13,R,8,R,6,R
-Chukha,Chu/Dra/2022/Chi-LA-55,CHU55,Camphylobacter jejuni,6,R,6,R,20,S,6,R,12,R,6,R,6,R
-Chukha,Chu/Dra/2022/Chi-LA-56,CHU56,Camphylobacter jejuni,8,R,23,I,21,S,6,R,13,R,10,R,6,R
-Chukha,Chu/Phu/2022/Chi-LA-56,CHU65,Camphylobacter jejuni,6,R,6,R,22,S,6,R,14,R,11,R,6,R
-Samtse,Sam/Nor/2022/Chi-Br-88,SAM 88,Camphylobacter jejuni,10,R,6,R,16,I,6,R,13,R,6,R,6,R
-Samtse,Sam/Pem/2022/Chi-LA-99,SAM 99,Camphylobacter jejuni,13,I,30,S,27,S,6,R,6,R,31,S,6,R
-Samtse,Sam/Nor/2022/Chi-Br-125,SAM 125,Camphylobacter jejuni,11,R,6,R,17,S,6,R,6,R,6,R,6,R
-Samtse,Sam/Sam/2022/Chi-Br-130,SAM 130,Camphylobacter jejuni,14,I,6,R,22,S,6,R,6,R,6,R,6,R
-Samtse,Sam/Sang/2022/Chi-Br-120,SAM 120,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
-Samtse,Sam/Sam/2022/Chi-Br-134,SAM 134,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
-Samtse,Sam/Tad/2022/Chi-Br-137,SAM 137,Camphylobacter jejuni,16,S,31,S,6,R,6,R,26,S,16,S,6,R
-Samtse,Sam/Tad/2022/Chi-Br-138,SAM 138,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
-Samtse,Sam/Tad/2022/Chi-Br-142,SAM 142,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
-Samtse,Sam/Den/2022/Chi-Br-153,SAM 153,Camphylobacter jejuni,14,I,26,S,6,R,6,R,23,I,20,S,6,R
-Samtse,Sam/Den/2022/Chi-Br-156,SAM 156,Camphylobacter jejuni,14,I,18,R,6,R,6,R,6,R,6,R,6,R
-Samtse,Sam/Den/2022/Chi-La-159,SAM 159,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
-Samtse,Sam/Dop/2022/Chi-La-169,SAM 169,Camphylobacter jejuni,17,S,16,R,6,R,22,S,24,S,6,R,12,I
-Paro,,PAR22,Camphylobacter jejuni,10,R,29,S,27,S,6,R,6,R,6,R,6,R
-Samdrup Jonkhar,Saj/Sam/22/Chi-Br/08,S8B,Camphylobacter,27,S,32,S,26,S,6,R,6,R,34,S,30,S
-Samdrup Jonkhar,Saj/Pem/22/Chi-Br/16,S16B,camphylobacter jejuni,17,S,32,S,29,S,6,R,6,R,6,R,6,R
-Sarpang,Sar/Uml/Chi-Ly/2022/12,SAR99,Camphylobacter jejuni,16,S,28,S,6,R,6,R,6,R,6,R,6,R
-Sarpang,Sar/Gel/Chi-Ly/2022/22,SAR109,Camphylobacter,13,I,6,R,31,S,6,R,20,R,30,S,6,R
-Sarpang,Sar/Ser/Chi-Ly/2022/27,SAR114,Camphylobacter jejuni,26,S,33,S,28,S,6,R,6,R,26,S,24,S
-Sarpang,Sar/Dek/Chi-Ly/2022/59,SAR146,Camphylobacter jejuni,16,S,35,S,29,S,6,R,6,R,6,R,6,R
-Sarpang,Sar/Dek/Chi-Ly/2022/60,SAR147,Camphylobacter jejuni,16,S,29,S,6,R,22,S,24,S,6,R,6,R
-Tsirang,Tsi/Tk/tsho/22/Chi/Br/81,TSI81,Camphylobacter jejuni,30,S,40,S,30,S,6,R,6,R,32,S,30,S
-Tsirang,Tsi/Go/Go/22/Chi/La/84,TSI84,Camphylobacter jejuni,30,S,32,S,32,S,6,R,6,R,28,S,27,S
-Tsirang,   Tsi/Ph/2022/Chi-Br/102,TSI102,Camphylobacter jejuni,13,I,6,R,31,S,6,R,20,R,30,S,6,R
-Tsirang,Tsi/Tk/Tm/22/Chi-Lay/119,TSI119,Camphylobacter,19,S,30,S,21,S,6,R,20,R,24,S,6,R
-Tsirang,Tsi/Kh/Dk/22/Chi-Lay/124,TSI124,Camphylobacter,15,S,6,R,34,S,6,R,23,I,6,R,6,R
+LAB CODE,Organism Isolated ,Gentamicin (10µg),"Sensitive, Intermediate, Resistant (SIR)",Tetracyclin (30µg),SIR,Ampicillin (10µg),SIR,Nalidixic acid (30µg),SIR,Ciprofloxacin (5µg),SIR,Erythromycin (15µg),SIR,Streptomycin,SIR
+1,Campylobacter,28,S,33,S,24,S,6,R,6,R,30,S,26,S
+2,Camphylobacter,24,S,34,S,23,S,6,R,6,R,27,S,27,S
+3,Campylobacter,26,S,36,S,6,R,6,R,6,R,6,R,25,S
+4,Campylobacter,28,S,16,R,18,S,13,R,6,R,30,S,20,S
+5,Camphylobacter,26,S,38,S,23,S,6,R,6,R,30,S,28,S
+6,Camphylobacter,11,R,6,R,20,S,6,R,17,R,29,S,6,R
+7,Camphylobacter,20,S,24,I,22,S,6,R,6,R,28,S,26,S
+8,Camphylobacter spp,30,S,32,S,32,S,6,R,6,R,36,S,30,S
+9,Camphylobacter,22,S,22,R,18,S,6,R,6,R,20,S,24,S
+10,Camphylobacter spp,26,S,26,S,32,S,6,R,6,R,30,S,26,S
+11,Camphylobacter,20,S,34,S,24,S,6,R,6,R,30,S,24,S
+12,Camphylobacter spp,26,S,28,S,32,S,6,R,6,R,36,S,26,S
+13,Camphylobacter,22,S,26,S,19,S,6,R,6,R,20,S,23,S
+14,Camphylobacter,26,S,26,S,36,S,6,R,6,R,36,S,26,S
+15,Camphylobacter,20,S,26,S,18,S,6,R,6,R,20,S,22,S
+16,Camphylobacter spp,28,S,32,S,33,S,6,R,6,R,26,S,28,S
+17,Camphylobacter spp,28,S,30,S,28,S,6,R,6,R,30,S,27,S
+18,Camphylobacter spp,27,S,31,S,22,S,6,R,6,R,28,S,26,S
+19,Camphylobacter spp,28,S,32,S,18,S,6,R,6,R,32,S,30,S
+20,Camphylobacterspp,26,S,28,S,33,S,6,R,6,R,29,S,27,S
+21,camphylobacter spp,30,S,30,S,25,S,6,R,6,R,23,S,30,S
+22,Camphylobacter spp,29,S,28,S,35,S,6,R,6,R,33,S,30,S
+23,Camphylobacter,21,S,23,I,20,S,6,R,6,R,23,S,23,S
+24,Camphylobacter,22,S,26,S,22,S,6,R,6,R,26,S,24,S
+25,Camphylobacter,24,S,32,S,22,S,6,R,6,R,28,S,30,S
+26,Camphylobacter,26,S,30,S,28,S,6,R,6,R,28,S,28,S
+27,Camphylobacter,21,S,26,S,23,S,6,R,6,R,26,S,28,S
+28,Camphylobacter spp,21,S,24,I,18,S,6,R,6,R,21,S,22,S
+29,Camphylobacter,20,S,23,I,18,S,6,R,6,R,22,S,24,S
+30,Camphylobacter,22,S,20,R,20,S,6,R,6,R,25,S,22,S
+31,Camphylobacter,22,S,24,I,20,S,6,R,6,R,26,S,24,S
+32,Camphylobacter,25,S,30,S,23,S,6,R,6,R,24,S,24,S
+33,Camphylobacter,20,S,28,S,18,S,6,R,6,R,22,S,27,S
+34,Camphylobacter,36,S,46,S,32,S,6,R,6,R,44,S,34,S
+35,Camphylobacter,30,S,32,S,30,S,6,R,6,R,38,S,28,S
+36,Camphylobacter ,30,S,32,S,30,S,6,R,6,R,38,S,28,S
+37,Campylobacter,22,S,40,S,20,S,6,R,6,R,35,S,22,S
+38,Campylobacter,23,S,26,S,24,S,6,R,6,R,31,S,22,S
+39,Campylobacter,25,S,40,S,28,S,6,R,6,R,35,S,24,S
+40,Campylobacter,26,S,27,S,21,S,6,R,6,R,26,S,26,S
+41,Campylobacter,30,S,40,S,22,S,6,R,6,R,34,S,26,S
+42,Campylobacter,32,S,33,S,23,S,6,R,6,R,27,S,31,S
+43,Campylobacter,26,S,40,S,20,S,6,R,6,R,32,S,24,S
+44,Campylobacter,26,S,45,S,20,S,6,R,6,R,38,S,26,S
+45,Campylobacter,26,S,40,S,26,S,6,R,6,R,36,S,26,S
+46,Campylobacter,23,S,26,S,25,S,6,R,6,R,32,S,23,S
+47,Campylobacter,26,S,32,S,22,S,6,R,6,R,32,S,26,S
+48,Campylobacter,26,S,36,S,26,S,6,R,6,R,40,S,26,S
+49,Campylobacter,26,S,40,S,26,S,6,R,6,R,32,S,26,S
+50,Campylobacter,20,S,32,S,22,S,6,R,6,R,26,S,20,S
+51,Campylobacter,26,S,38,S,14,I,6,R,6,R,32,S,26,S
+52,Campylobacter,28,S,38,S,14,I,6,R,6,R,36,S,26,S
+53,Campylobacter,28,S,6,R,14,I,6,R,6,R,36,S,26,S
+54,Campylobacter,26,S,6,R,14,I,6,R,6,R,32,S,26,S
+55,Campylobacter,24,S,34,S,22,S,6,R,6,R,23,S,25,S
+56,Campylobacter,26,S,36,S,18,S,6,R,6,R,34,S,26,S
+57,Campylobacter,31,S,34,S,34,S,6,R,6,R,32,S,28,S
+58,Campylobacter,30,S,44,S,30,S,6,R,6,R,36,S,28,S
+59,Campylobacter,32,S,36,S,30,S,6,R,6,R,30,S,30,S
+60,Campylobacter,26,S,25,I,32,S,6,R,6,R,30,S,26,S
+61,Campylobacter,31,S,30,S,25,S,6,R,6,R,26,S,27,S
+62,Campylobacter,30,S,32,S,30,S,6,R,6,R,34,S,28,S
+63,Campylobacter,28,S,28,S,30,S,6,R,6,R,32,S,27,S
+64,Campylobacter,30,S,40,S,26,S,6,R,6,R,32,S,34,S
+65,Campylobacter,28,S,42,S,32,S,6,R,6,R,40,S,32,S
+66,Campylobacter,31,S,30,S,29,S,6,R,6,R,32,S,27,S
+67,Campylobacter,28,S,31,S,27,S,6,R,6,R,28,S,30,S
+68,Campylobacter,28,S,33,S,24,S,6,R,6,R,36,S,32,S
+69,Campylobacter,30,S,32,S,30,S,6,R,6,R,38,S,28,S
+70,Campylobacter,23,S,21,R,19,S,20,S,22,I,21,S,20,S
+71,Campylobacter,18,S,10,R,25,S,10,R,6,R,23,S,6,R
+72,Campylobacter,29,S,46,S,36,S,6,R,6,R,44,S,28,S
+73,Campylobacter,26,S,42,S,26,S,6,R,6,R,36,S,26,S
+74,Campylobacter,26,S,42,S,17,S,6,R,6,R,36,S,26,S
+75,Campylobacter,30,S,44,S,32,S,6,R,6,R,42,S,28,S
+76,Campylobacter,34,S,40,S,28,S,6,R,6,R,42,S,30,S
+77,Campylobacter,30,S,44,S,30,S,6,R,6,R,30,S,28,S
+78,Campylobacter,30,S,48,S,34,S,6,R,6,R,36,S,28,S
+79,Campylobacter,26,S,44,S,23,S,6,R,6,R,32,S,24,S
+80,Campylobacter,32,S,40,S,26,S,6,R,6,R,42,S,30,S
+81,Campylobacter,28,S,46,S,32,S,6,R,6,R,40,S,27,S
+82,Campylobacter,34,S,40,S,28,S,6,R,6,R,42,S,34,S
+83,Campylobacter,25,S,46,S,32,S,6,R,6,R,36,S,21,S
+84,Campylobacter,25,S,42,S,16,I,6,R,6,R,32,S,21,S
+85,Campylobacter,28,S,16,R,28,S,6,R,6,R,30,S,28,S
+86,Campylobacter,26,S,26,S,28,S,6,R,6,R,30,S,24,S
+87,Camphylobacter jejuni,27,S,30,S,24,S,6,R,6,R,30,S,24,S
+88,Camphylobacter jejuni,8,R,6,R,19,S,6,R,13,R,8,R,6,R
+89,Camphylobacter jejuni,6,R,6,R,20,S,6,R,12,R,6,R,6,R
+90,Camphylobacter jejuni,8,R,23,I,21,S,6,R,13,R,10,R,6,R
+91,Camphylobacter jejuni,6,R,6,R,22,S,6,R,14,R,11,R,6,R
+92,Camphylobacter jejuni,10,R,6,R,16,I,6,R,13,R,6,R,6,R
+93,Camphylobacter jejuni,13,I,30,S,27,S,6,R,6,R,31,S,6,R
+94,Camphylobacter jejuni,11,R,6,R,17,S,6,R,6,R,6,R,6,R
+95,Camphylobacter jejuni,14,I,6,R,22,S,6,R,6,R,6,R,6,R
+96,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
+97,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
+98,Camphylobacter jejuni,16,S,31,S,6,R,6,R,26,S,16,S,6,R
+99,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
+100,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
+101,Camphylobacter jejuni,14,I,26,S,6,R,6,R,23,I,20,S,6,R
+102,Camphylobacter jejuni,14,I,18,R,6,R,6,R,6,R,6,R,6,R
+103,Camphylobacter jejuni,6,R,16,R,6,R,6,R,6,R,6,R,6,R
+104,Camphylobacter jejuni,17,S,16,R,6,R,22,S,24,S,6,R,12,I
+105,Camphylobacter jejuni,10,R,29,S,27,S,6,R,6,R,6,R,6,R
+106,Camphylobacter,27,S,32,S,26,S,6,R,6,R,34,S,30,S
+107,camphylobacter jejuni,17,S,32,S,29,S,6,R,6,R,6,R,6,R
+108,Camphylobacter jejuni,16,S,28,S,6,R,6,R,6,R,6,R,6,R
+109,Camphylobacter,13,I,6,R,31,S,6,R,20,R,30,S,6,R
+110,Camphylobacter jejuni,26,S,33,S,28,S,6,R,6,R,26,S,24,S
+111,Camphylobacter jejuni,16,S,35,S,29,S,6,R,6,R,6,R,6,R
+112,Camphylobacter jejuni,16,S,29,S,6,R,22,S,24,S,6,R,6,R
+113,Camphylobacter jejuni,30,S,40,S,30,S,6,R,6,R,32,S,30,S
+114,Camphylobacter jejuni,30,S,32,S,32,S,6,R,6,R,28,S,27,S
+115,Camphylobacter jejuni,13,I,6,R,31,S,6,R,20,R,30,S,6,R
+116,Camphylobacter,19,S,30,S,21,S,6,R,20,R,24,S,6,R
+117,Camphylobacter,15,S,6,R,34,S,6,R,23,I,6,R,6,R
