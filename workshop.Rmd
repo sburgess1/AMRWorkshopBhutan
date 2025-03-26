@@ -504,9 +504,70 @@ hist(ecoli_select$TCY)
 hist(ecoli_select$SXT)
 ```
 
+***Exercise***
+
+* Read in the Enterococci and Salmonella excel sheets and assign them to "enterococci" and "salmonella".
+* Remove the SIR columns
+* Change column names 
+* Add a column called species with the appropriate species name (e.g. Enterococcus sp. Salmonella sp.)
+* Check the data for multiple types of categorical values, missing values, outliers etc...
+
+Hint use the as.ab() function to find the abbreviations for tigecycline, vancomycin, quinupristin-dalfopristin, linzolid and ertapenem
+```{r, results='hide', echo = FALSE, mesage = FALSE}
+enterococci <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Enterococci")
+#Remove columns starting with SIR, change column names and add a new column with species                    
+enterococci_select <- enterococci%>% 
+  select(!starts_with("SIR")) %>%
+  setNames(c("meat_shop", "stratification", "date_collection", "sample_type",
+             "sample_collection", "sample_weight_Kg", 
+             "sample_source", "farm_category", "slaughter", "transportation", 
+             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", 
+             "CHL", "AMP", "TCY", "ERY", "TGC", "QDA", "VAN", "LNZ")) %>%
+  mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
+         meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"),
+         farm_category = str_to_title(farm_category)) %>%
+  mutate(species = "Enterococcus sp.")
+
+salmonella <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Salmonella")
+#Remove columns starting with SIR, change column names and add a new column with species                    
+salmonella_select <- salmonella%>% 
+  select(!starts_with("SIR"), -c(1, 17, 36:37)) %>%
+  setNames(c("meat_shop", "stratification",  
+             "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
+             "sample_source", "farm_category", "slaughter", "transportation", 
+             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", "GEN",
+             "CHL", "MEM", "CRO", "CIP", "NAL", "AMP", "TCY", "SXT", "ETP")) %>%
+  mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
+         meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"),
+         farm_category = str_to_title(farm_category)) %>%
+  mutate(species = "Salmonella sp.")
+
+enterococci_select$date_collection <- ymd(enterococci_select$date_collection)
+salmonella_select$date_collection <- ymd(salmonella_select$date_collection)
+```
+
+Bind the ecoli, enteroccoci and salmonella data frames together.
+
+```{r bindrows}
+#Where columns don't match will get NA
+df <- bind_rows(ecoli_select, salmonella_select, enterococci_select) %>%
+  select(species, 1:31) #select species first then remainder of columns
+str(df)
+```
+
+To bind columns from together from two data frames use one of the join functions inner_join(), left_join() (keeps all observations in x), right_join() (keeps all observations in y) or a full_join() see https://dplyr.tidyverse.org/reference/mutate-joins.html for more information. Here is one example.
+
+```{r join}
+meta <- read_csv("data/metadata.csv")
+df_join <- full_join(ecoli, meta, by = "FTL code")
+str(df_join)
+```
+
 \pagebreak
 
 ## Day 2: Using the AMR R package
+
+If the ecoli, enterococci and salmonella data sets are not still in your environment. Reload, tidy them and join them together by rerunning the script generated from day 1.
 
 **Generating an antibiogram**
 
@@ -583,67 +644,6 @@ Make a basic plot of the antibiograms using the autoplot() function.
 ```{r}
 
 autoplot(ant)
-```
-
-$\\$
-
-***Exercise***
-
-* Read in the Enterococci and Salmonella excel sheets and assign them to "enterococci" and "salmonella".
-* Remove the SIR columns
-* Change column names 
-* Add a column called species with the appropriate species name (e.g. Enterococcus sp. Salmonella sp.)
-* Check the data for multiple types of categorical values, missing values, outliers etc...
-
-Hint use the as.ab() function to find the abbreviations for tigecycline, vancomycin, quinupristin-dalfopristin, linzolid and ertapenem
-```{r, results='hide', echo = FALSE, mesage = FALSE}
-enterococci <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Enterococci")
-#Remove columns starting with SIR, change column names and add a new column with species                    
-enterococci_select <- enterococci%>% 
-  select(!starts_with("SIR")) %>%
-  setNames(c("meat_shop", "stratification", "date_collection", "sample_type",
-             "sample_collection", "sample_weight_Kg", 
-             "sample_source", "farm_category", "slaughter", "transportation", 
-             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", 
-             "CHL", "AMP", "TCY", "ERY", "TGC", "QDA", "VAN", "LNZ")) %>%
-  mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
-         meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"),
-         farm_category = str_to_title(farm_category)) %>%
-  mutate(species = "Enterococcus sp.")
-
-salmonella <- read_excel("data/bh_AMR_Surveillance_datav2.xlsx", sheet = "Salmonella")
-#Remove columns starting with SIR, change column names and add a new column with species                    
-salmonella_select <- salmonella%>% 
-  select(!starts_with("SIR"), -c(1, 17, 36:37)) %>%
-  setNames(c("meat_shop", "stratification",  
-             "date_collection", "sample_type", "sample_collection", "sample_weight_Kg", 
-             "sample_source", "farm_category", "slaughter", "transportation", 
-             "transport_medium", "transport_with_other_meat", "sample_ID", "FTL_code", "GEN",
-             "CHL", "MEM", "CRO", "CIP", "NAL", "AMP", "TCY", "SXT", "ETP")) %>%
-  mutate(meat_shop = str_replace_all(meat_shop, "\\.", ""),  # Remove all dots
-         meat_shop = str_replace(meat_shop, "Bebak MS", "BK MS"),
-         farm_category = str_to_title(farm_category)) %>%
-  mutate(species = "Salmonella sp.")
-
-enterococci_select$date_collection <- ymd(enterococci_select$date_collection)
-salmonella_select$date_collection <- ymd(salmonella_select$date_collection)
-```
-
-Bind the ecoli, enteroccoci and salmonella data frames together.
-
-```{r bindrows}
-#Where columns don't match will get NA
-df <- bind_rows(ecoli_select, salmonella_select, enterococci_select) %>%
-  select(species, 1:31) #select species first then remainder of columns
-str(df)
-```
-
-To bind columns from together from two data frames use one of the join functions inner_join(), left_join() (keeps all observations in x), right_join() (keeps all observations in y) or a full_join() see https://dplyr.tidyverse.org/reference/mutate-joins.html for more information. Here is one example.
-
-```{r join}
-meta <- read_csv("data/metadata.csv")
-df_join <- full_join(ecoli, meta, by = "FTL code")
-str(df_join)
 ```
 
 $\\$
@@ -1030,11 +1030,9 @@ ggplots are made up of geoms and aesthetics. The geoms are the way in which the 
 
 The main structure for generating a ggplot is:
 
-ggplot(data = <dataframe> + 
+`ggplot(data = <dataframe> +` 
 
-geom<name>(mapping = aes(x = <x_variable>, y = <y_variable>, color = <variable_for_color>)) +
-
-labs(x = <x_axis_label>, y = <y_axis_label>))
+`geom<name>(mapping = aes(x = <x_variable>, y = <y_variable>, color = <variable_for_color>)) + labs(x = <x_axis_label>, y = <y_axis_label>))`
 
 See [the basics of ggplot](https://d3c33hcgiwev3.cloudfront.net/fsV6V9GESOqUefnwRfLe0w_2eaf49b2cfcf450db2f2bb95681f55f1_03_01grammarofgraphics.html?Expires=1741046400&Signature=CP49Mmw63hpCBlR5IBPO~We~0Djsy5Qox2zfzNyAISHCWkq6Amnqz6o8-1mcao8FBsA0hOvT4iKd7VARcOBVj5aamI6GMNxPgb2MDld2udjVFGQZu-4RNp0kKCEg693bmJOf6ryogLAXgKPEUT9-dVZ852EnOk-0iZU89PVvt7w_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) from the arranging and visualising coursera course or [ggplot2 website](https://ggplot2.tidyverse.org/) for more about ggplots.
 
@@ -1045,7 +1043,6 @@ $\\$
 Here are some basic examples of how to construct scatterplots.The color or shape arguments can be used to change the appearance of the points. The facet_wrap function is used to wrap multiple plots together. The geom_smooth function adds in an overall trend line  as well as the 95% confidence intervals for that line, which are represented by the gray zone.
 
 ```{r ggplot}
-
 #Basic scatter plots
 ggplot(data = ecoli3) +
   geom_point(mapping = aes(x = date_collection, y = CHL_disk, color = farm_category)) +
@@ -1263,7 +1260,6 @@ library(rnaturalearthhires)
 Obtain the spatial data and merge with the reshaped data.
 
 ```{r}
-
 #Obtain spatial data (sf object) for Bhutan using the ne_states() function
 bhutan_map <- ne_states(country = "Bhutan", returnclass = "sf")
 
@@ -1275,19 +1271,16 @@ Plot the data
 
 ```{r}
 ggplot(data = map_data) +
-geom_sf(aes(fill = percent_resistant)) +  # Plot a spatial object Fill regions based on resistance
-geom_sf_text(aes(label = ifelse(is.na(percent_resistant), name_sv, # if na label with name_sv (region) 
-paste0(name_sv, "\n", round(percent_resistant, 1), "%") #else label with name_sv and percen_resistant. \n is newline character
-)),
-color = "black", size = 3) +  # Colors region names black size 3
-scale_fill_gradient(low = "lightblue", high = "darkblue", na.value = "white", #Apply a colour gradient to the map
-name = "Resistance Rate (%)") +
-theme_minimal() + #Use a minimal theme then add to it
-theme(axis.text = element_blank(), #Remove axis labels
-axis.ticks = element_blank(), #Remove axis ticks
-panel.grid = element_blank(), #Remove panel grid
-axis.title = element_blank() #Remove axis labels
-)
+  geom_sf(aes(fill = percent_resistant)) +  # Plot a spatial object Fill regions based on resistance
+  geom_sf_text(aes(label = ifelse(is.na(percent_resistant), name_sv,  # if NA label with name_sv (region) 
+                                  paste0(name_sv, "\n", round(percent_resistant, 1), "%")  # else label with name_sv and percent_resistant
+                                  )), color = "black", size = 3) +  # Colors region names black size 3
+  scale_fill_gradient(low = "lightblue", high = "darkblue", na.value = "white") +  # <- Closing parenthesis added here
+  theme_minimal() +  # Use a minimal theme then add to it
+  theme(axis.text = element_blank(),  # Remove axis labels
+        axis.ticks = element_blank(),  # Remove axis ticks
+        panel.grid = element_blank(),  # Remove panel grid
+        axis.title = element_blank())  # Remove axis labels
 ```
 
 This example uses the ecoli dataset to illustrate how to generate a multi-panel boxplot for two collection points.
@@ -1302,7 +1295,7 @@ df_summary
 
 #Boxplot
 ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) +
-  geom_boxplot(outlier.shape = NA, alpha = 0.5) +  # Boxplot (removing default outliers)
+  geom_boxplot(alpha = 0.5) +  # Boxplot 
   geom_jitter(aes(color = antibiotic), size = 2, alpha = 0.7) +  # Plot jittered data points size 2 and transparency 0.7
   facet_wrap(~ sample_collection) +  # Create two panels separate by sample_collection
   scale_fill_brewer(palette = "Set3") + #specify the colour palette to be used for box plot
@@ -1325,8 +1318,6 @@ ggplot(df_summary, aes(x = antibiotic, y = mean_resistance, fill = antibiotic)) 
     theme(legend.position = "top", #position legend at the top
           axis.text.x = element_blank(),  # Remove x-axis text)
           axis.title.x = element_blank())  # Remove x-axis label
-              
-
 ```
 
 This example demonstrates how to generate a mirrored barplot similar to that in presented in Mughini-Gras 2019 Lancet Planet Health 2019: 
@@ -1346,16 +1337,15 @@ data <- tibble(
 data <- data %>%
   mutate(Prevalence = -Prevalence)
 
-# Create the mirrored bar chart
+# Create the mirrored bar chart  with no colour gradient
 ggplot(data) +
   geom_col(aes(x = Prevalence, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.5) +  # Left side
   geom_col(aes(x = HumanExposure, y = reorder(Source, Prevalence)), fill = "blue", alpha = 0.8) +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
   geom_vline(xintercept = 0, linetype = "dashed") +  # Center line
   labs(x = "ESBL prevalence (%)       |       Human exposure (%)",
        y = "") +
-  theme_minimal(base_size = 14)
-
+  theme_minimal()
+#Create the mirrored bar chart with a colour gradient
 ggplot(data) +
   geom_col(aes(x = Prevalence, y = reorder(Source, Prevalence), fill = -Prevalence), alpha = 0.8) +  # Left side
   geom_col(aes(x = HumanExposure, y = reorder(Source, Prevalence), fill = HumanExposure), alpha = 0.8) +  # Right side
@@ -1364,7 +1354,7 @@ ggplot(data) +
   labs(x = "ESBL prevalence (%)       |       Human exposure (%)",
        y = "",
        fill = "Prevalence/Exposure (%)") +
-  theme_minimal(base_size = 14)
+  theme_minimal()
 ```
 
 $\\$
@@ -1402,7 +1392,6 @@ upset(dat,abs, #create an upset plot with the dataframe dat and the intersection
     + ylab('Number of isolates') #yaxi label
     + labs(fill = "Region2")), #label legend
   width_ratio=0.1 #width of intersecton bars
-  #stripes='white'
   ) & scale_fill_manual(values = myPalette) 
 ```
 
@@ -1414,7 +1403,7 @@ This code was adapted by Patrick Biggs and Natalia Gonzalez from https://stackov
 
 It generates a multi-panel grid plot with a density plot (showing the data distribution) on the diagonal, correlation values in the upper right triangle and hexbin density plots in the lower left triangle.
 
-```{r}
+```{r, warning=FALSE}
 #Load libraries
 library(hexbin)
 library(GGally)
